@@ -36,6 +36,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# sanity (generated runtime)
+.sanity/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

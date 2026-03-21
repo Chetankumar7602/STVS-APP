@@ -1,0 +1,32 @@
+[
+  {
+    "_id": "1",
+    "title": "Our School Achieves 100% Results in Board Exams",
+    "excerpt": "Celebrating the incredible hard work and dedication of our 8th-grade students who achieved a perfect score in their recent examinations.",
+    "content": "We are thrilled to announce that Subudhendra Teertha Vidya Samaste has achieved a monumental milestone - 100% pass results in the recent board examinations. This success is a testament to the unwavering dedication of our students, the tireless efforts of our teaching staff, and the continuous support of our community partners.\n\nOur students, many of whom come from challenging socio-economic backgrounds, have proven that with quality education and the right environment, excellence is within reach. Among the top performers, several students achieved distinctions in Mathematics and Science, subjects we have heavily invested in over the past academic year.\n\nDr. Siddalingesh Ankalkoti, our founder, expressed his pride: \"This is not just about grades; it is about the doors that are now opening for these children. They are beginning to believe in a future that seemed impossible just a few years ago.\" We look forward to seeing these graduates continue their journey into higher education and beyond.",
+    "category": "School Updates",
+    "author": "Admin Team",
+    "createdAt": "2024-03-15T12:00:00Z",
+    "image": "/assets/picNew3.jpeg"
+  },
+  {
+    "_id": "2",
+    "title": "Success Story: From Vadavatti to Vidya Samaste",
+    "excerpt": "How one student from a remote village overcame barriers to access quality English medium education through our scholarship program.",
+    "content": "Ravi's journey began in the small, distant village of Vadavatti. Like many children in his region, access to quality English medium education was a distant dream, hampered by both geography and financial constraints. However, Ravi's story took a pivotal turn when he was enrolled at STVS Trust.\n\nFrom his first day, Ravi showed an insatiable curiosity and a natural aptitude for languages. Through our comprehensive scholarship program and the personalized attention of our educators, Ravi not only bridged the language gap but became a leader in his class. Today, Ravi is one of our brightest students, participating in district-level debates and aspiring to become an engineer.\n\n\"Vidya Samaste did not just give me books; they gave me a vision,\" Ravi shares. His story is one of many that fuel our mission to bring world-class education to every corner of our region, ensuring that no child's potential is limited by their birthplace.",
+    "category": "Success Stories",
+    "author": "Outreach Coordinator",
+    "createdAt": "2024-03-10T12:00:00Z",
+    "image": "/assets/picNew13.jpg"
+  },
+  {
+    "_id": "3",
+    "title": "Annual Community Sports Meet 2024",
+    "excerpt": "A vibrant day of athleticism and team spirit as students from 12 villages competed in various traditional and modern sports.",
+    "content": "The grounds of STVS Trust were filled with energy, cheers, and high spirits during our Annual Community Sports Meet 2024. This event serves as a platform to highlight the physical talents of our students while fostering a sense of camaraderie and healthy competition.\n\nStudents from all grades participated in various events including track and field, volleyball, and traditional regional games. Beyond the competition, the meet emphasized the importance of teamwork and discipline - qualities we aim to instill in every student. The day concluded with an awards ceremony where medals were presented by local community leaders, who commended the school for its holistic approach to student development.\n\nSports play a crucial role in our curriculum, helping our students build resilience and confidence. We believe that a strong body complements a strong mind, and events like these are essential in shaping well-rounded individuals ready to face life's challenges.",
+    "category": "Community Events",
+    "author": "Physical Education Dept",
+    "createdAt": "2024-03-05T12:00:00Z",
+    "image": "/assets/picNew11.jpg"
+  }
+]

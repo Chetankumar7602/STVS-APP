@@ -1,36 +1,95 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Subudhendra Teertha Vidya Samaste (R) - Official Website
 
-## Getting Started
+This is a complete, production-ready, full-stack Next.js application built for the charitable trust. It features a modern, animated public landing page and a secure admin panel to manage donations, contacts, and volunteers.
 
-First, run the development server:
+## Tech Stack
+- **Frontend**: Next.js 15 (App Router), Tailwind CSS, Framer Motion, Lucide React
+- **Backend**: Next.js API Routes
+- **Database**: MongoDB Atlas (via Mongoose)
+- **Authentication**: JWT & bcrypt (Admin only)
+- **Deployment**: Vercel
 
+---
+
+## 🛠️ Local Setup Guide
+
+### 1. Prerequisites
+- Node.js (v18 or higher)
+- npm or yarn
+- A MongoDB Atlas account
+
+### 2. Installation
+Clone or download the project, then install dependencies:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 3. Environment Variables
+Create a `.env.local` file in the root directory by copying the `.env.example`:
+```bash
+cp .env.example .env.local
+```
+Fill in your `MONGODB_URI` and `JWT_SECRET`.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+### 4. Create Initial Admin User
+Before you can log into the admin panel, you must create an admin user in the database. Run the included script:
+```bash
+npm run admin:create -- --username=admin --password="use-a-strong-password"
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Alternative using environment variables:
+```bash
+ADMIN_USERNAME=admin ADMIN_PASSWORD="use-a-strong-password" npm run admin:create
+```
 
-## Learn More
+Security notes:
+- Admin scripts no longer contain default credentials.
+- Password must be at least 10 characters.
+- Never commit real credentials or connection strings to source control.
 
-To learn more about Next.js, take a look at the following resources:
+### 5. Start Development Server
+```bash
+npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000) for the public site and [http://localhost:3000/admin](http://localhost:3000/admin) for the admin portal.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🚀 Deployment Guide
 
-## Deploy on Vercel
+### Part 1: MongoDB Atlas Setup
+1. Create a free cluster on [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
+2. Go to **Database Access** and create a database user with a password.
+3. Go to **Network Access** and add IP `0.0.0.0/0` to allow connections from anywhere (required for Vercel).
+4. Click **Connect** on your cluster, choose **Connect your application**, and copy the connection string. Replace `<username>` and `<password>`.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Part 2: Vercel Deployment
+1. Push your code to a GitHub/GitLab/Bitbucket repository.
+2. Log into [Vercel](https://vercel.com/) and click **Add New** > **Project**.
+3. Import your repository.
+4. Open the **Environment Variables** section before deploying and add:
+   - `MONGODB_URI`: *Your connection string from Atlas*
+   - `JWT_SECRET`: *A strong random string for JWT signing*
+   - `NEXT_PUBLIC_BASE_URL`: *Your production Vercel URL (e.g., https://my-charity.vercel.app)*
+5. Click **Deploy**. Vercel will build and launch your application automatically.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Part 3: Production Admin User
+Once deployed, Vercel cannot run the `scripts/create-admin.js` easily. You have two options:
+1. **Local connect to Prod DB**: Temporarily change your local `.env.local` `MONGODB_URI` to your production Atlas string, run `npm run admin:create -- --username=... --password=...`, and revert.
+2. **Atlas UI**: Manually create a document in the `adminusers` collection using a pre-hashed bcrypt password.
+
+### 4. Testing
+- Go to your public Vercel URL. Test the Donate form, Contact form, and Volunteer form.
+- Go to your MongoDB Atlas dashboard -> Browse Collections to verify data is captured.
+- Go to `yoursite.com/admin` and log in with the admin credentials. Verify stats and tables load.
+
+---
+
+## Folder Structure Overview
+- `/app`: Next.js App Router (Public pages and `/admin` routes)
+- `/app/api`: Backend API endpoints
+- `/components`: Reusable UI components (Hero, About, Forms, etc.)
+- `/models`: Mongoose database schemas
+- `/lib`: Helper utilities (MongoDB connection, JWT auth, and static JSON data)
+- `/public`: Static assets (images, icons)
+- `/scripts`: Setup scripts
