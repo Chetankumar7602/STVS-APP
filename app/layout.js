@@ -4,6 +4,7 @@ import "./globals.css";
 import { siteData } from "@/lib/data";
 import FloatingMapsButton from "@/components/FloatingMapsButton";
 import RootLayoutClient from "@/components/RootLayoutClient";
+import { Analytics } from "@vercel/analytics/next";
 
 const outfit = Outfit({ subsets: ["latin"], display: 'swap' });
 
