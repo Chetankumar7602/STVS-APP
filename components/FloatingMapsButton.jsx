@@ -2,10 +2,9 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { useSiteSettings } from '@/lib/useSiteSettings';
 
 const STORAGE_KEY = 'stvs-maps-corner';
-const ADDRESS = 'Guttala road, Hosaritti, Haveri 581213';
+const MAP_PIN_QUERY = '14.889333,75.560721';
 
 const CORNERS = {
   'top-left': { top: 96, left: 24 },
@@ -29,7 +28,6 @@ function GoogleMapsMarkerIcon() {
 
 export default function FloatingMapsButton() {
   const pathname = usePathname();
-  const { settings } = useSiteSettings();
   const [corner, setCorner] = useState('bottom-right');
   const [dragPosition, setDragPosition] = useState(null);
   const [ready, setReady] = useState(false);
@@ -42,11 +40,8 @@ export default function FloatingMapsButton() {
   const buttonRef = useRef(null);
 
   const mapsUrl = useMemo(() => {
-    const mapsSetting = String(settings.contact_maps_url || '').trim();
-    if (mapsSetting) return mapsSetting;
-    const address = String(settings.contact_address || ADDRESS).trim();
-    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
-  }, [settings.contact_maps_url, settings.contact_address]);
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(MAP_PIN_QUERY)}`;
+  }, []);
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
@@ -57,7 +52,9 @@ export default function FloatingMapsButton() {
       setReady(true);
     });
 
-    return () => window.cancelAnimationFrame(frame);
+    return () => {
+      window.cancelAnimationFrame(frame);
+    };
   }, []);
 
   const saveCorner = (nextCorner) => {
@@ -158,7 +155,7 @@ export default function FloatingMapsButton() {
         dragStateRef.current.active = false;
         setDragPosition(null);
       }}
-      className="fixed z-70 flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-white shadow-[0_18px_40px_rgba(26,115,232,0.28)] ring-1 ring-slate-200 transition-transform duration-200 hover:scale-105"
+      className="fixed z-70 flex h-12 w-12 touch-none cursor-pointer items-center justify-center rounded-full bg-white shadow-[0_18px_40px_rgba(26,115,232,0.28)] ring-1 ring-slate-200 transition-transform duration-200 hover:scale-105"
       style={fixedStyle}
     >
       <span className="pointer-events-none absolute inset-0 rounded-full bg-red-500/30 animate-ping" />

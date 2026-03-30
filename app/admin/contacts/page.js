@@ -24,6 +24,7 @@ export default function ContactsTable() {
   const [bulkExporting, setBulkExporting] = useState(false);
   const [deletingId, setDeletingId] = useState('');
   const [deleteTargetId, setDeleteTargetId] = useState('');
+  const [deleteSelectedModalOpen, setDeleteSelectedModalOpen] = useState(false);
 
   useEffect(() => {
     trRef.current = tr;
@@ -173,13 +174,20 @@ export default function ContactsTable() {
         return;
       }
 
-      const confirmed = window.confirm(
-        tr('admin.contacts.confirmDeleteSelected', 'Delete selected messages? This cannot be undone.')
-      );
-      if (!confirmed) {
+      setDeleteSelectedModalOpen(true);
+    } catch (err) {
+      console.error(err);
+      setActionMessage(err.message || tr('admin.contacts.deleteSelectedFailed', 'Failed to delete selected messages.'));
+    }
+  };
+
+  const confirmDeleteSelected = async () => {
+    try {
+      setActionMessage('');
+      if (selectedIds.length === 0) {
+        setDeleteSelectedModalOpen(false);
         return;
       }
-
       setBulkDeleting(true);
       const res = await fetch('/api/admin/contacts/bulk', {
         method: 'DELETE',
@@ -199,6 +207,7 @@ export default function ContactsTable() {
 
       setActionMessage(tr('admin.contacts.deleteSelectedSuccess', 'Selected messages deleted successfully.'));
       setSelectedIds([]);
+      setDeleteSelectedModalOpen(false);
       await fetchContacts(page, search, sort);
     } catch (err) {
       console.error(err);
@@ -445,6 +454,44 @@ export default function ContactsTable() {
                 className="px-4 py-2 rounded-xl bg-red-600 text-white font-semibold hover:bg-red-700 disabled:opacity-70 flex items-center gap-2"
               >
                 {deletingId === deleteTargetId ? <Loader2 className="animate-spin" size={16} /> : <Trash2 size={16} />}
+                {tr('admin.common.delete', 'Delete')}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {deleteSelectedModalOpen ? (
+        <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/60 p-4">
+          <div className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl">
+            <div className="flex items-start gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-red-50 text-red-600">
+                <AlertTriangle size={22} />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-xl font-bold text-slate-800">{tr('admin.common.delete', 'Delete')}</h2>
+                <p className="mt-2 text-sm text-slate-500">
+                  {tr('admin.contacts.confirmDeleteSelected', 'Delete selected messages? This cannot be undone.')}
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setDeleteSelectedModalOpen(false)}
+                disabled={bulkDeleting}
+                className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50"
+              >
+                {tr('admin.common.cancel', 'Cancel')}
+              </button>
+              <button
+                type="button"
+                onClick={confirmDeleteSelected}
+                disabled={bulkDeleting}
+                className="px-4 py-2 rounded-xl bg-red-600 text-white font-semibold hover:bg-red-700 disabled:opacity-70 flex items-center gap-2"
+              >
+                {bulkDeleting ? <Loader2 className="animate-spin" size={16} /> : <Trash2 size={16} />}
                 {tr('admin.common.delete', 'Delete')}
               </button>
             </div>

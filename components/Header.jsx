@@ -22,6 +22,16 @@ export default function Header() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Lock page scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [mobileMenuOpen]);
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (!langDropdownRef.current) return;
@@ -71,6 +81,7 @@ export default function Header() {
   ];
 
   return (
+    <>
     <header 
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-white/90 backdrop-blur-md shadow-sm py-3' : 'bg-transparent py-5'}`}
     >
@@ -162,62 +173,76 @@ export default function Header() {
           {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
 
-        {/* Mobile Menu */}
-        <AnimatePresence>
-          {mobileMenuOpen && (
-            <motion.div 
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="fixed inset-0 bg-white z-40 flex flex-col items-center justify-center p-6 lg:hidden shadow-xl overflow-y-auto"
-            >
-              <div className="flex flex-col items-center gap-6 w-full max-w-sm">
-                {navigationLinks.map((link, index) => (
-                  <a 
-                    key={index}
-                    href={`#${link.sectionId}`}
-                    onClick={(e) => scrollToSection(e, link.sectionId)}
-                    className="text-xl font-medium text-slate-800 hover:text-primary transition-colors py-2 border-b border-slate-100 w-full text-center"
-                  >
-                    {link.label}
-                  </a>
-                ))}
-                
-                {/* Language Dropdown Mobile */}
-                <div className="w-full mt-4 pt-4 border-t border-slate-200">
-                  <p className="text-sm font-semibold text-slate-600 mb-3">{t.admin.selectLanguage}</p>
-                  <div className="flex gap-2 w-full">
-                    {languages.map((lang) => (
-                      <button
-                        key={lang.code}
-                        onClick={() => {
-                          changeLanguage(lang.code);
-                          setMobileMenuOpen(false);
-                        }}
-                        className={`flex-1 px-3 py-2 rounded-lg transition-all text-sm font-medium cursor-pointer ${
-                          language === lang.code
-                            ? 'bg-primary text-white'
-                            : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                        }`}
-                      >
-                        {lang.nativeName}
-                      </button>
-                    ))}
-                  </div>
-                </div>
+        {/* Mobile Menu Overlay Toggle */}
 
-                <a
-                  href="#donate"
-                  onClick={(e) => scrollToSection(e, 'donate')}
-                  className="mt-4 bg-primary text-white w-full py-4 rounded-full font-bold text-center shadow-lg active:scale-95 transition-transform text-lg"
-                >
-                  {t.common.header.donateNow}
-                </a>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
     </header>
+
+    {/* Mobile Menu — rendered outside header so it's truly viewport-fixed */}
+    <AnimatePresence>
+      {mobileMenuOpen && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.22, ease: 'easeOut' }}
+          className="fixed inset-0 bg-white z-[9999] flex flex-col items-center justify-center p-6 lg:hidden shadow-xl overflow-y-auto"
+          style={{ top: 0, left: 0, right: 0, bottom: 0 }}
+        >
+          {/* Close button top-right */}
+          <button
+            onClick={() => setMobileMenuOpen(false)}
+            className="absolute top-5 right-5 p-2 rounded-full bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors"
+          >
+            <X size={24} />
+          </button>
+
+          <div className="flex flex-col items-center gap-6 w-full max-w-sm">
+            {navigationLinks.map((link, index) => (
+              <a
+                key={index}
+                href={`#${link.sectionId}`}
+                onClick={(e) => scrollToSection(e, link.sectionId)}
+                className="text-xl font-medium text-slate-800 hover:text-primary transition-colors py-2 border-b border-slate-100 w-full text-center"
+              >
+                {link.label}
+              </a>
+            ))}
+
+            {/* Language selector */}
+            <div className="w-full mt-4 pt-4 border-t border-slate-200">
+              <p className="text-sm font-semibold text-slate-600 mb-3">{t.admin.selectLanguage}</p>
+              <div className="flex gap-2 w-full">
+                {languages.map((lang) => (
+                  <button
+                    key={lang.code}
+                    onClick={() => {
+                      changeLanguage(lang.code);
+                      setMobileMenuOpen(false);
+                    }}
+                    className={`flex-1 px-3 py-2 rounded-lg transition-all text-sm font-medium cursor-pointer ${
+                      language === lang.code
+                        ? 'bg-primary text-white'
+                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                    }`}
+                  >
+                    {lang.nativeName}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <a
+              href="#donate"
+              onClick={(e) => scrollToSection(e, 'donate')}
+              className="mt-4 bg-primary text-white w-full py-4 rounded-full font-bold text-center shadow-lg active:scale-95 transition-transform text-lg"
+            >
+              {t.common.header.donateNow}
+            </a>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+    </>
   );
 }

@@ -29,8 +29,8 @@ const DonationSchema = new mongoose.Schema({
   },
   paymentMethod: {
     type: String,
-    enum: ['razorpay', 'upi_qr'],
-    default: 'razorpay',
+    enum: ['upi_qr', 'bank_transfer'],
+    default: 'upi_qr',
   },
   upiReference: {
     type: String,
@@ -48,14 +48,9 @@ const DonationSchema = new mongoose.Schema({
     type: String,
     maxlength: [300, 'Review reason cannot be more than 300 characters'],
   },
-  razorpayOrderId: {
+  transactionId: {
     type: String,
-  },
-  razorpayPaymentId: {
-    type: String,
-  },
-  razorpaySignature: {
-    type: String,
+    maxlength: [120, 'Transaction ID cannot be more than 120 characters'],
   },
   createdAt: {
     type: Date,

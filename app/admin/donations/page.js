@@ -33,7 +33,6 @@ export default function DonationsTable() {
   const [bulkUpdating, setBulkUpdating] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [selectionMode, setSelectionMode] = useState('');
-  const [razorpayStatusFilter, setRazorpayStatusFilter] = useState('all');
   const [selectingByFilter, setSelectingByFilter] = useState(false);
   const [editingDonation, setEditingDonation] = useState(null);
   const [editDraft, setEditDraft] = useState({
@@ -266,26 +265,7 @@ export default function DonationsTable() {
     }
   };
 
-  const handleSelectRazorpayOnly = async () => {
-    try {
-      setActionMessage('');
-      closeReview();
-      setSelectionMode('razorpay');
-      setSelectingByFilter(true);
-      const ids = await requestSelectionIds('razorpay', razorpayStatusFilter === 'all' ? '' : razorpayStatusFilter);
-      setSelectedIds(ids);
-      setActionMessage(
-        ids.length
-          ? `${tr('admin.donations.selected', 'Selected')} ${ids.length} ${tr('admin.donations.razorpayEntries', 'Razorpay entries')} ${tr('admin.donations.successfully', 'successfully')}.`
-          : tr('admin.donations.noRazorpayEntries', 'No Razorpay entries found for the current search.')
-      );
-    } catch (err) {
-      console.error(err);
-      setActionMessage(err.message || tr('admin.donations.failedSelectRazorpay', 'Failed to select Razorpay entries.'));
-    } finally {
-      setSelectingByFilter(false);
-    }
-  };
+
 
   const handleBulkReview = async () => {
     try {
@@ -501,7 +481,7 @@ export default function DonationsTable() {
       <div className="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <h1 className="text-3xl font-bold text-slate-800">{tr('admin.donations.title', 'Donations')}</h1>
-          <p className="mt-1 text-slate-500">{tr('admin.donations.subtitle', 'Manage Razorpay and manual UPI QR contribution records.')}</p>
+          <p className="mt-1 text-slate-500">{tr('admin.donations.subtitle', 'Manage UPI QR donation records and verify payments.')}</p>
         </div>
         <div className="w-full overflow-x-auto lg:w-auto">
           <div className="flex min-w-max items-center gap-3">
@@ -525,25 +505,7 @@ export default function DonationsTable() {
               ) : null}
             </div>
 
-            <div className="flex items-center gap-2 rounded-2xl border border-sky-200 bg-sky-50 px-3 py-2">
-              <button
-                onClick={handleSelectRazorpayOnly}
-                disabled={selectingByFilter}
-                className="flex cursor-pointer items-center gap-2 rounded-xl bg-sky-100 px-4 py-2 font-medium text-sky-800 transition-colors hover:bg-sky-200 disabled:opacity-60"
-              >
-                {selectingByFilter && selectionMode === 'razorpay' ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle2 size={16} />}
-                {tr('admin.donations.selectRazorpayOnly', 'Select Razorpay Only')}
-              </button>
-              <select
-                value={razorpayStatusFilter}
-                onChange={(e) => setRazorpayStatusFilter(e.target.value)}
-                className="cursor-pointer rounded-xl border border-sky-200 bg-white px-3 py-2 text-sm font-medium text-sky-800 outline-none focus:ring-2 focus:ring-sky-200"
-              >
-                <option value="all">{tr('admin.common.all', 'All')}</option>
-                <option value="successful">{tr('admin.common.successful', 'Successful')}</option>
-                <option value="pending">{tr('admin.common.pending', 'Pending')}</option>
-              </select>
-            </div>
+
 
             {selectedIds.length > 0 ? (
               <>
@@ -726,7 +688,7 @@ export default function DonationsTable() {
                         {getStatusLabel(item)}
                       </span>
                     </td>
-                    <td className="p-4 text-sm text-slate-600">{item.paymentMethod === 'upi_qr' ? tr('admin.donations.upiQr', 'UPI QR') : tr('admin.donations.razorpay', 'Razorpay')}</td>
+                    <td className="p-4 text-sm text-slate-600">{item.paymentMethod === 'bank_transfer' ? 'Bank Transfer' : 'UPI QR'}</td>
                     <td className="p-4 text-sm text-slate-600">{item.phone || '-'}</td>
                     <td className="p-4 text-sm text-slate-600">{item.email || '-'}</td>
                     <td className={`whitespace-nowrap p-4 text-right font-bold ${getAmountColorClass(item)}`}>
@@ -763,8 +725,8 @@ export default function DonationsTable() {
                           </div>
                         </div>
                       ) : item.email && (
-                        (item.paymentMethod === 'razorpay' && item.status === 'successful') ||
-                        (item.paymentMethod === 'upi_qr' && (item.manualReviewStatus === 'successful' || item.manualReviewStatus === 'wrong_amount'))
+                        (item.paymentMethod === 'upi_qr' && (item.manualReviewStatus === 'successful' || item.manualReviewStatus === 'wrong_amount')) ||
+                        (item.paymentMethod === 'bank_transfer' && (item.manualReviewStatus === 'successful' || item.manualReviewStatus === 'wrong_amount'))
                       ) ? (
                         <div className="flex flex-wrap gap-2">
                           {item.paymentMethod === 'upi_qr' ? (

@@ -210,6 +210,12 @@
     "upiReference": "UPI Transaction Reference / UTR *",
     "upiReferencePlaceholder": "Enter UPI reference after payment",
     "submitUpi": "Submit UPI Payment For Verification",
+    "scanInstruction": "Scan the QR below with any UPI app, then fill in your details and submit.",
+    "qrStep1Label": "Step 1",
+    "qrStep1Title": "Scan & Pay via UPI",
+    "qrStep1Text": "Use GPay, PhonePe, Paytm, BHIM, or any UPI app to scan this QR and pay directly to the trust account.",
+    "qrStep2Label": "Step 2 — Required",
+    "qrStep2Text": "After paying, enter your UPI transaction reference / UTR number below and submit. This is mandatory to receive your receipt.",
     "taxNotice": "All donations are tax-deductible under Section 80G of the Income Tax Act. The institution is also registered under Section 12A and is eligible for CSR contributions.",
     "impactPoints": {
       "books": "₹1,000 sponsors a child's books & stationery for a term",

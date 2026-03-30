@@ -12,6 +12,8 @@ export async function GET(request) {
     }
 
     await connectToDatabase();
+
+    // Migrate legacy records that have no paymentMethod set
     await Donation.updateMany(
       {
         $or: [
@@ -20,9 +22,7 @@ export async function GET(request) {
           { paymentMethod: '' },
         ],
       },
-      {
-        $set: { paymentMethod: 'razorpay' },
-      }
+      { $set: { paymentMethod: 'upi_qr' } }
     );
 
     const { searchParams } = new URL(request.url);
@@ -42,20 +42,10 @@ export async function GET(request) {
         { phone: { $regex: search, $options: 'i' } },
       ];
     }
-    if (paymentMethod === 'razorpay') {
-      query.$and = [
-        ...(query.$and || []),
-        {
-          $or: [
-            { paymentMethod: 'razorpay' },
-            { paymentMethod: { $exists: false } },
-            { paymentMethod: null },
-            { paymentMethod: '' },
-          ],
-        },
-      ];
-    } else if (paymentMethod === 'upi_qr') {
+    if (paymentMethod === 'upi_qr') {
       query.paymentMethod = 'upi_qr';
+    } else if (paymentMethod === 'bank_transfer') {
+      query.paymentMethod = 'bank_transfer';
     }
     if (statusFilter === 'successful') {
       query.status = 'successful';
@@ -101,12 +91,12 @@ export async function GET(request) {
           email: item.email || '',
           amount: item.amount || 0,
           confirmedAmount: item.confirmedAmount || '',
-          paymentMethod: item.paymentMethod || 'razorpay',
+          paymentMethod: item.paymentMethod || 'upi_qr',
           status: item.status || '',
           manualReviewStatus: item.manualReviewStatus || '',
           upiReference: item.upiReference || '',
+          transactionId: item.transactionId || '',
           message: item.message || '',
-          paymentId: item.razorpayPaymentId || '',
         })),
         [
           { key: 'date', label: 'Date' },
@@ -119,8 +109,8 @@ export async function GET(request) {
           { key: 'status', label: 'Status' },
           { key: 'manualReviewStatus', label: 'Manual Review Status' },
           { key: 'upiReference', label: 'UPI Reference' },
+          { key: 'transactionId', label: 'Transaction ID' },
           { key: 'message', label: 'Message' },
-          { key: 'paymentId', label: 'Payment ID' },
         ]
       );
 

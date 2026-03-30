@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useSiteSettings } from '@/lib/useSiteSettings';
 
 const DEFAULT_EMAIL = 'subudendrateerthavidyasamste@gmail.com';
+const MAP_PIN_QUERY = '14.889333,75.560721';
 
 function normalizePhoneForTel(phone) {
   const raw = String(phone || '').trim();
@@ -15,12 +16,8 @@ function normalizePhoneForTel(phone) {
   return digits ? `tel:${digits}` : '';
 }
 
-function buildMapsUrl(mapsUrl, address) {
-  const trimmed = String(mapsUrl || '').trim();
-  if (trimmed) return trimmed;
-  const addressText = String(address || '').trim();
-  if (!addressText) return '';
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addressText)}`;
+function buildMapsUrl(_mapsUrl, _address) {
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(MAP_PIN_QUERY)}`;
 }
 
 export default function Footer() {
