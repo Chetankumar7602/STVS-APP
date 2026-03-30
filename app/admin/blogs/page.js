@@ -200,6 +200,7 @@ export default function AdminBlogsPage() {
     await handleDelete(blogId);
   };
 
+  // Blogs page restored to original implementation (layout, styles, and behavior).
   return (
     <div className="p-6 md:p-8">
       <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
