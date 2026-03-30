@@ -1,5 +1,6 @@
 import { Outfit } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { siteData } from "@/lib/data";
 import FloatingMapsButton from "@/components/FloatingMapsButton";
@@ -29,6 +30,7 @@ export default function RootLayout({ children }) {
           <FloatingMapsButton />
         </RootLayoutClient>
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
