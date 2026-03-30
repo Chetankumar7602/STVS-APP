@@ -1,4 +1,5 @@
 import { Outfit } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { siteData } from "@/lib/data";
 import FloatingMapsButton from "@/components/FloatingMapsButton";
@@ -27,6 +28,7 @@ export default function RootLayout({ children }) {
           {children}
           <FloatingMapsButton />
         </RootLayoutClient>
+        <Analytics />
       </body>
     </html>
   );
