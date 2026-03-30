@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@sanity/vision": "3.99.0",
+    "@vercel/analytics": "^2.0.1",
     "bcryptjs": "^3.0.3",
     "dotenv": "^17.3.1",
     "framer-motion": "^12.38.0",
