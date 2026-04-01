@@ -33,9 +33,9 @@ export default function AdminLogin() {
     return () => media.removeEventListener('change', apply);
   }, []);
 
-  // Auto-trigger fingerprint on page load (app-lock experience)
+  // Auto-trigger fingerprint on page load (app-lock experience) - Mobile only
   useEffect(() => {
-    if (!supportsPasskey || autoPasskeyAttempted) return;
+    if (!supportsPasskey || autoPasskeyAttempted || !isMobile) return;
     // Small delay so the page renders first
     const timer = setTimeout(() => {
       setAutoPasskeyAttempted(true);
@@ -43,7 +43,7 @@ export default function AdminLogin() {
     }, 600);
     return () => clearTimeout(timer);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [supportsPasskey]);
+  }, [supportsPasskey, isMobile, autoPasskeyAttempted]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
