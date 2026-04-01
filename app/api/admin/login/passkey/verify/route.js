@@ -14,36 +14,39 @@ export async function POST(request) {
   const body = await request.json().catch(() => ({}));
   const username = sanitizeIdentifier(body.username);
   const credential = body.response;
-  if (!username || !credential) {
-    return NextResponse.json({ success: false, message: 'Username and fingerprint response are required.' }, { status: 400 });
+  const expectedChallenge = body.expectedChallenge;
+
+  if (!credential || !expectedChallenge) {
+    return NextResponse.json({ success: false, message: 'Fingerprint response and challenge are required.' }, { status: 400 });
   }
 
   await connectToDatabase();
-  const admin = await AdminUser.findOne({ username });
-  if (!admin) {
-    return NextResponse.json({ success: false, message: 'Invalid credentials.' }, { status: 401 });
+
+  const challenge = await PasskeyChallenge.findOne({
+    challenge: expectedChallenge,
+    type: 'authentication',
+    consumedAt: null,
+  });
+
+  if (!challenge || challenge.expiresAt < new Date()) {
+    return NextResponse.json({ success: false, message: 'Fingerprint challenge expired or invalid. Try again.' }, { status: 400 });
+  }
+
+  const passkey = await AdminPasskey.findOne({
+    credentialID: credential.id,
+  });
+
+  if (!passkey || !passkey.userId) {
+    return NextResponse.json({ success: false, message: 'Fingerprint credential not recognized.' }, { status: 401 });
+  }
+
+  const admin = await AdminUser.findById(passkey.userId);
+  if (!admin || (username && admin.username !== username)) {
+    return NextResponse.json({ success: false, message: 'Invalid credentials or user mismatch.' }, { status: 401 });
   }
 
   if (!isAllowedAdminEmail(admin.email)) {
     return NextResponse.json({ success: false, message: 'Access denied. Your email is not allowed for admin portal.' }, { status: 403 });
-  }
-
-  const challenge = await PasskeyChallenge.findOne({
-    userId: admin._id,
-    type: 'authentication',
-    consumedAt: null,
-  }).sort({ createdAt: -1 });
-
-  if (!challenge || challenge.expiresAt < new Date()) {
-    return NextResponse.json({ success: false, message: 'Fingerprint challenge expired. Try again.' }, { status: 400 });
-  }
-
-  const passkey = await AdminPasskey.findOne({
-    userId: admin._id,
-    credentialID: credential.id,
-  });
-  if (!passkey) {
-    return NextResponse.json({ success: false, message: 'Fingerprint credential not recognized.' }, { status: 401 });
   }
 
   const { rpID, expectedOrigin } = getPasskeyConfig(request.url);

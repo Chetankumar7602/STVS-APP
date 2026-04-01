@@ -121,11 +121,6 @@ export default function AdminLogin() {
   };
 
   const handleMobileFingerprintLogin = async () => {
-    if (!username.trim()) {
-      setError('Enter username first to use fingerprint login.');
-      return;
-    }
-
     setPasskeyLoading(true);
     setError('');
     setMessage('');
@@ -147,7 +142,11 @@ export default function AdminLogin() {
       const verifyRes = await fetch('/api/admin/login/passkey/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, response: authResponse }),
+        body: JSON.stringify({ 
+          username, 
+          response: authResponse,
+          expectedChallenge: optionsData.expectedChallenge 
+        }),
       });
       const verifyData = await readJsonResponse(verifyRes);
       if (!verifyRes.ok || !verifyData.success) {

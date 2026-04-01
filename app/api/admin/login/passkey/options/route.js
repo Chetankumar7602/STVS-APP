@@ -10,22 +10,26 @@ import { getPasskeyConfig } from '@/lib/passkey';
 export async function POST(request) {
   const body = await request.json().catch(() => ({}));
   const username = sanitizeIdentifier(body.username);
-  if (!username) {
-    return NextResponse.json({ success: false, message: 'Username is required for fingerprint login.' }, { status: 400 });
-  }
 
   await connectToDatabase();
-  const admin = await AdminUser.findOne({ username });
-  if (!admin) {
-    return NextResponse.json({ success: false, message: 'User not found.' }, { status: 404 });
-  }
+  let admin = null;
+  let passkeys = [];
 
-  const passkeys = await AdminPasskey.find({ userId: admin._id }).lean();
-  if (passkeys.length === 0) {
-    return NextResponse.json({ success: false, message: 'No fingerprint/passkey is configured for this account.' }, { status: 400 });
+  if (username) {
+    admin = await AdminUser.findOne({ username });
+    if (!admin) {
+      return NextResponse.json({ success: false, message: 'User not found.' }, { status: 404 });
+    }
+    passkeys = await AdminPasskey.find({ userId: admin._id }).lean();
+    if (passkeys.length === 0) {
+      return NextResponse.json({ success: false, message: 'No fingerprint/passkey is configured for this account.' }, { status: 400 });
+    }
   }
 
   const { rpID } = getPasskeyConfig(request.url);
+  
+  // If no passkeys are provided (because no username was sent), this signals the device
+  // to search for any valid Resident Key / Discoverable Credential for this rpID.
   const options = await generateAuthenticationOptions({
     rpID,
     userVerification: 'required',
@@ -38,10 +42,10 @@ export async function POST(request) {
   await PasskeyChallenge.create({
     challenge: options.challenge,
     type: 'authentication',
-    userId: admin._id,
-    username: admin.username,
+    userId: admin ? admin._id : null,
+    username: admin ? admin.username : '',
     expiresAt: new Date(Date.now() + 10 * 60 * 1000),
   });
 
-  return NextResponse.json({ success: true, options });
+  return NextResponse.json({ success: true, options, expectedChallenge: options.challenge });
 }
