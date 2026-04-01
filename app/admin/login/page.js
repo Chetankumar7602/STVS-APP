@@ -24,23 +24,30 @@ export default function AdminLogin() {
   const [autoPasskeyAttempted, setAutoPasskeyAttempted] = useState(false);
 
   useEffect(() => {
-    const media = window.matchMedia('(max-width: 767px)');
-    const apply = () => setIsMobile(media.matches);
-    apply();
-    media.addEventListener('change', apply);
+    const checkMobile = () => {
+      const isMobileSize = window.matchMedia('(max-width: 767px)').matches;
+      const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      setIsMobile(isMobileSize || isMobileUA);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
     const supported = Boolean(window.PublicKeyCredential);
     setSupportsPasskey(supported);
-    return () => media.removeEventListener('change', apply);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Auto-trigger fingerprint on page load (app-lock experience) - Mobile only
+  // Auto-trigger fingerprint on page load (app-lock experience) - Strictly Mobile only
   useEffect(() => {
-    if (!supportsPasskey || autoPasskeyAttempted || !isMobile) return;
-    // Small delay so the page renders first
+    // Only trigger if we ARE on mobile, supports passkey, and haven't tried yet
+    if (!isMobile || !supportsPasskey || autoPasskeyAttempted) return;
+
+    // Small delay to let page settle and ensure isMobile is accurate
     const timer = setTimeout(() => {
       setAutoPasskeyAttempted(true);
       handleMobileFingerprintLogin({ silent: true });
-    }, 600);
+    }, 1000);
+    
     return () => clearTimeout(timer);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [supportsPasskey, isMobile, autoPasskeyAttempted]);
