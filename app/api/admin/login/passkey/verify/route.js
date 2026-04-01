@@ -32,15 +32,27 @@ export async function POST(request) {
     return NextResponse.json({ success: false, message: 'Fingerprint challenge expired or invalid. Try again.' }, { status: 400 });
   }
 
+  // Normalize the credential ID — WebAuthn returns it as base64url string.
+  // Some older browsers/devices may return it differently, so we normalize it.
+  const rawCredentialId = credential.id || (credential.rawId ? Buffer.from(credential.rawId).toString('base64url') : null);
+  if (!rawCredentialId) {
+    return NextResponse.json({ success: false, message: 'Fingerprint credential ID missing.' }, { status: 400 });
+  }
+
   const passkey = await AdminPasskey.findOne({
-    credentialID: credential.id,
+    credentialID: rawCredentialId,
   });
 
-  if (!passkey || !passkey.userId) {
+  // If not found by id, try rawId as base64url (extra compatibility)
+  const passkeyFinal = passkey || await AdminPasskey.findOne({
+    credentialID: credential.rawId ? Buffer.from(credential.rawId).toString('base64url') : '__none__',
+  });
+
+  if (!passkeyFinal || !passkeyFinal.userId) {
     return NextResponse.json({ success: false, message: 'Fingerprint credential not recognized.' }, { status: 401 });
   }
 
-  const admin = await AdminUser.findById(passkey.userId);
+  const admin = await AdminUser.findById(passkeyFinal.userId);
   if (!admin || (username && admin.username !== username)) {
     return NextResponse.json({ success: false, message: 'Invalid credentials or user mismatch.' }, { status: 401 });
   }
@@ -57,10 +69,10 @@ export async function POST(request) {
     expectedRPID: rpID,
     requireUserVerification: true,
     credential: {
-      id: passkey.credentialID,
-      publicKey: Buffer.from(passkey.publicKey, 'base64url'),
-      counter: passkey.counter || 0,
-      transports: passkey.transports || [],
+      id: passkeyFinal.credentialID,
+      publicKey: Buffer.from(passkeyFinal.publicKey, 'base64url'),
+      counter: passkeyFinal.counter || 0,
+      transports: passkeyFinal.transports || [],
     },
   });
 
@@ -68,9 +80,9 @@ export async function POST(request) {
     return NextResponse.json({ success: false, message: 'Fingerprint verification failed.' }, { status: 401 });
   }
 
-  passkey.counter = verification.authenticationInfo.newCounter;
-  passkey.lastUsedAt = new Date();
-  await passkey.save();
+  passkeyFinal.counter = verification.authenticationInfo.newCounter;
+  passkeyFinal.lastUsedAt = new Date();
+  await passkeyFinal.save();
 
   challenge.consumedAt = new Date();
   await challenge.save();
