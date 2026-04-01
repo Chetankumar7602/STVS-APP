@@ -21,15 +21,29 @@ export default function AdminLogin() {
   const [passkeyLoading, setPasskeyLoading] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const [autoPasskeyAttempted, setAutoPasskeyAttempted] = useState(false);
 
   useEffect(() => {
     const media = window.matchMedia('(max-width: 767px)');
     const apply = () => setIsMobile(media.matches);
     apply();
     media.addEventListener('change', apply);
-    setSupportsPasskey(Boolean(window.PublicKeyCredential));
+    const supported = Boolean(window.PublicKeyCredential);
+    setSupportsPasskey(supported);
     return () => media.removeEventListener('change', apply);
   }, []);
+
+  // Auto-trigger fingerprint on page load (app-lock experience)
+  useEffect(() => {
+    if (!supportsPasskey || autoPasskeyAttempted) return;
+    // Small delay so the page renders first
+    const timer = setTimeout(() => {
+      setAutoPasskeyAttempted(true);
+      handleMobileFingerprintLogin({ silent: true });
+    }, 600);
+    return () => clearTimeout(timer);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [supportsPasskey]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -131,10 +145,12 @@ export default function AdminLogin() {
     }
   };
 
-  const handleMobileFingerprintLogin = async () => {
+  const handleMobileFingerprintLogin = async ({ silent = false } = {}) => {
     setPasskeyLoading(true);
-    setError('');
-    setMessage('');
+    if (!silent) {
+      setError('');
+      setMessage('');
+    }
 
     try {
       const optionsRes = await fetch('/api/admin/login/passkey/options', {
@@ -144,7 +160,7 @@ export default function AdminLogin() {
       });
       const optionsData = await readJsonResponse(optionsRes);
       if (!optionsRes.ok || !optionsData.success) {
-        setError(optionsData.message || 'Fingerprint login is not available.');
+        if (!silent) setError(optionsData.message || 'Fingerprint login is not available.');
         return;
       }
 
@@ -161,13 +177,17 @@ export default function AdminLogin() {
       });
       const verifyData = await readJsonResponse(verifyRes);
       if (!verifyRes.ok || !verifyData.success) {
-        setError(verifyData.message || 'Fingerprint verification failed.');
+        if (!silent) setError(verifyData.message || 'Fingerprint verification failed.');
         return;
       }
 
       window.location.href = '/admin';
     } catch (err) {
-      setError(err?.message || 'Fingerprint authentication cancelled or unavailable.');
+      // NotAllowedError = user cancelled or no credential — suppress silently on auto-trigger
+      const isCancelled = err?.name === 'NotAllowedError' || err?.name === 'AbortError';
+      if (!silent || !isCancelled) {
+        setError(err?.message || 'Fingerprint authentication cancelled or unavailable.');
+      }
     } finally {
       setPasskeyLoading(false);
     }
