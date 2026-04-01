@@ -42,8 +42,8 @@ export default function Founder() {
         <div className="max-w-5xl mx-auto bg-white rounded-3xl shadow-xl overflow-hidden shadow-slate-200/50">
           <div className="grid md:grid-cols-5 items-stretch">
             
-            <div className="md:col-span-2 relative min-h-[400px] md:min-h-full bg-slate-200 overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent z-10 flex items-end p-8">
+            <div className="md:col-span-2 relative min-h-100 md:min-h-full bg-slate-200 overflow-hidden">
+              <div className="absolute inset-0 bg-linear-to-t from-primary/80 to-transparent z-10 flex items-end p-8">
                 <div>
                   <h3 className="text-3xl font-bold text-white shadow-sm">{tr('founder.name', founder.name)}</h3>
                   <p className="text-white/90 font-medium text-lg mt-1">{tr('founder.role', 'Visionary & Founder')}</p>
@@ -51,7 +51,7 @@ export default function Founder() {
               </div>
               <div className="absolute inset-0">
                 <Image src="/assets/MyImg.jpeg" alt={founder.name} fill className="object-cover object-top" />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent z-10 pointer-events-none"></div>
+                <div className="absolute inset-0 bg-linear-to-t from-slate-900/80 via-transparent to-transparent z-10 pointer-events-none"></div>
               </div>
             </div>
             
@@ -66,7 +66,12 @@ export default function Founder() {
                   transition={{ delay: 0.2 }}
                   className="text-xl md:text-2xl font-light text-slate-700 leading-relaxed mb-8 italic"
                 >
-                  "{tr('founder.quote', "True education is not a privilege for the few, but a fundamental right for all. When we empower a child with knowledge, we don't just change one life, we uplift an entire generation. Subudhendra Teertha Vidya Samaste is my commitment to this belief.")}"
+                  &ldquo;
+                  {tr(
+                    'founder.quote',
+                    "True education is not a privilege for the few, but a fundamental right for all. When we empower a child with knowledge, we don't just change one life, we uplift an entire generation. Subudhendra Teertha Vidya Samaste is my commitment to this belief."
+                  )}
+                  &rdquo;
                 </motion.p>
                 
                 <motion.div 

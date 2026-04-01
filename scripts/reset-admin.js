@@ -19,20 +19,40 @@ function getArgValue(flag) {
 
 const username = getArgValue('--username') || process.env.ADMIN_USERNAME;
 const password = getArgValue('--password') || process.env.ADMIN_PASSWORD;
+const email = getArgValue('--email') || process.env.ADMIN_EMAIL;
 
 if (!username || !password) {
   console.error('Missing admin credentials. Use --username=... --password=... or set ADMIN_USERNAME and ADMIN_PASSWORD.');
   process.exit(1);
 }
 
-if (password.length < 10) {
-  console.error('Refusing weak password. Use at least 10 characters.');
+if (email && !String(email).includes('@')) {
+  console.error('Invalid admin email. Use --email=... or set ADMIN_EMAIL.');
+  process.exit(1);
+}
+
+const passwordChecks = [
+  { ok: password.length >= 12, message: 'at least 12 characters' },
+  { ok: /[A-Z]/.test(password), message: 'one uppercase letter' },
+  { ok: /[a-z]/.test(password), message: 'one lowercase letter' },
+  { ok: /\d/.test(password), message: 'one number' },
+  { ok: /[^A-Za-z0-9]/.test(password), message: 'one symbol' },
+];
+
+const failedPolicy = passwordChecks.filter((check) => !check.ok).map((check) => check.message);
+if (failedPolicy.length > 0) {
+  console.error(`Refusing weak password. Missing: ${failedPolicy.join(', ')}.`);
   process.exit(1);
 }
 
 const AdminUserSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
-  password: { type: String, required: true }
+  password: { type: String, required: true },
+  role: { type: String, enum: ['admin', 'superadmin'], default: 'superadmin' },
+  twoFactorEnabled: { type: Boolean, default: false },
+  twoFactorMethod: { type: String, enum: ['email', 'sms', 'authenticator'], default: 'email' },
+  email: { type: String, default: '' },
+  phone: { type: String, default: '' },
 });
 
 const AdminUser = mongoose.models.AdminUser || mongoose.model('AdminUser', AdminUserSchema);
@@ -42,15 +62,16 @@ async function resetAdmin() {
     const host = MONGODB_URI.includes('@') ? MONGODB_URI.split('@')[1] : 'mongodb-uri-hidden';
     console.log('Connecting to:', host); // Log host only for safety
     await mongoose.connect(MONGODB_URI, { serverSelectionTimeoutMS: 5000 });
-    
+
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    await AdminUser.findOneAndUpdate(
-      { username },
-      { username, password: hashedPassword },
-      { upsert: true, new: true }
-    );
+    const update = { username, password: hashedPassword };
+    if (email) {
+      update.email = String(email).trim().toLowerCase();
+    }
+
+    await AdminUser.findOneAndUpdate({ username }, update, { upsert: true, new: true });
 
     console.log(`ADMIN_RESET_SUCCESS: Username: ${username}`);
     process.exit(0);

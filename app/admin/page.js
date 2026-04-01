@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from 'react';
-import { IndianRupee, MessageSquare, HandHeart, ArrowUpRight, Download, Trash2, Loader2 } from 'lucide-react';
+import { IndianRupee, MessageSquare, HandHeart, ArrowUpRight, Download, Trash2, Loader2, ShieldAlert } from 'lucide-react';
 import Link from 'next/link';
 import { readJsonResponse } from '@/lib/response';
 import { useLanguage } from '@/lib/useLanguage';
@@ -22,6 +22,10 @@ export default function AdminDashboard() {
   const [exportMsg, setExportMsg] = useState('');
   const [showArchiveDialog, setShowArchiveDialog] = useState(false);
   const [archiveMode, setArchiveMode] = useState('export'); // 'export' | 'exportClear'
+  const [sessions, setSessions] = useState([]);
+  const [securityEvents, setSecurityEvents] = useState([]);
+  const [sessionsLoading, setSessionsLoading] = useState(true);
+  const [revokeLoadingId, setRevokeLoadingId] = useState('');
   const [archiveSections, setArchiveSections] = useState({
     donations: true,
     contacts: true,
@@ -53,6 +57,75 @@ export default function AdminDashboard() {
 
     fetchStats();
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function fetchSecurityData() {
+      try {
+        if (cancelled) return;
+
+        setSessionsLoading(true);
+
+        const [sessionsRes, eventsRes] = await Promise.all([
+          fetch('/api/admin/sessions?all=1'),
+          fetch('/api/admin/security/events?all=1'),
+        ]);
+
+        if (sessionsRes.status === 401 || eventsRes.status === 401) {
+          window.location.href = '/admin/login';
+          return;
+        }
+
+        const [sessionsData, eventsData] = await Promise.all([
+          readJsonResponse(sessionsRes),
+          readJsonResponse(eventsRes),
+        ]);
+
+        if (sessionsData.success) {
+          setSessions(sessionsData.data || []);
+        }
+        if (eventsData.success) {
+          setSecurityEvents(eventsData.data || []);
+        }
+      } catch {
+        // Optional security panel; fail silently to avoid blocking dashboard.
+      } finally {
+        setSessionsLoading(false);
+      }
+    }
+
+    fetchSecurityData();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const revokeSession = async (sessionId) => {
+    try {
+      setRevokeLoadingId(sessionId);
+      const res = await fetch(`/api/admin/sessions/${sessionId}/revoke`, { method: 'POST' });
+      const data = await readJsonResponse(res);
+      if (!res.ok || !data.success) {
+        setExportMsg(data.message || 'Failed to revoke session.');
+        return;
+      }
+
+      setSessions((current) =>
+        current.map((session) =>
+          session.id === sessionId
+            ? { ...session, revokedAt: new Date().toISOString() }
+            : session
+        )
+      );
+      setExportMsg('Session revoked successfully.');
+    } catch {
+      setExportMsg('Failed to revoke session.');
+    } finally {
+      setRevokeLoadingId('');
+    }
+  };
 
   const downloadExport = async (sections) => {
     setExporting(true);
@@ -163,10 +236,16 @@ export default function AdminDashboard() {
     );
   }
 
+  const totalDonationsDisplay = new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    maximumFractionDigits: 0,
+  }).format(Number(stats.totalDonationAmount || 0));
+
   const statCards = [
     {
       title: tr('admin.dashboard.totalDonations', 'Total Donations'),
-      value: `₹${stats.totalDonationAmount?.toLocaleString('en-IN') || 0}`,
+      value: totalDonationsDisplay,
       subtitle: `${stats.totalDonationsCount || 0} ${tr('admin.dashboard.totalContributions', 'total contributions')}`,
       icon: <IndianRupee size={24} />,
       color: 'bg-emerald-100 text-emerald-600',
@@ -295,6 +374,79 @@ export default function AdminDashboard() {
         </div>
       </div>
 
+      <div className="mt-6 rounded-2xl border border-sky-100 bg-sky-50 px-4 py-3 text-sm text-sky-800">
+        Security sign-in records (sessions, login attempts, and activity logs) are retained for 7 days and auto-deleted.
+      </div>
+      <div className="mt-8 grid gap-6 lg:grid-cols-2">
+        <div className="rounded-3xl border border-slate-100 bg-white shadow-sm flex flex-col overflow-hidden">
+          <div className="flex items-center gap-2 border-b border-slate-100 bg-white px-6 py-4">
+            <ShieldAlert size={18} className="text-slate-600" />
+            <h3 className="text-lg font-bold text-slate-800">Active Sessions</h3>
+          </div>
+          <div className="overflow-y-auto px-6 py-3 h-[23.5rem]">
+            {sessionsLoading ? (
+              <p className="text-sm text-slate-500">Loading sessions...</p>
+            ) : sessions.length === 0 ? (
+              <p className="text-sm text-slate-500">No active sessions found.</p>
+            ) : (
+              <div className="space-y-2">
+                {sessions.slice(0, 30).map((session) => (
+                  <div key={session.id} className="h-16 rounded-xl border border-slate-100 p-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="text-sm font-semibold text-slate-700 truncate">{session.username}</p>
+                        <p className="mt-0.5 text-xs text-slate-500 truncate">
+                          {(session.ip || 'Unknown IP')}   Last active:{' '}
+                          {session.lastActivityAt ? new Date(session.lastActivityAt).toLocaleString('en-IN') : 'N/A'}
+                        </p>
+                      </div>
+                      {!session.revokedAt && !session.isCurrent ? (
+                        <button
+                          onClick={() => revokeSession(session.id)}
+                          disabled={revokeLoadingId === session.id}
+                          className="rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-100 disabled:opacity-60"
+                        >
+                          {revokeLoadingId === session.id ? 'Revoking...' : 'Revoke'}
+                        </button>
+                      ) : (
+                        <span className="text-xs font-semibold text-slate-400">
+                          {session.isCurrent ? 'Current' : 'Revoked'}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="rounded-3xl border border-slate-100 bg-white shadow-sm flex flex-col overflow-hidden">
+          <div className="flex items-center gap-2 border-b border-slate-100 bg-white px-6 py-4">
+            <ShieldAlert size={18} className="text-slate-600" />
+            <h3 className="text-lg font-bold text-slate-800">Security Activity</h3>
+          </div>
+          <div className="overflow-y-auto px-6 py-3 h-[23.5rem]">
+            {securityEvents.length === 0 ? (
+              <p className="text-sm text-slate-500">No security events yet.</p>
+            ) : (
+              <div className="space-y-2">
+                {securityEvents.slice(0, 30).map((event) => (
+                  <div key={event.id} className="h-16 rounded-xl border border-slate-100 p-3">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-semibold text-slate-700 truncate">{event.type}</p>
+                      <span className="text-xs uppercase tracking-wide text-slate-400">{event.severity}</span>
+                    </div>
+                    <p className="mt-1 text-xs text-slate-500 truncate">
+                      {event.username || 'Unknown user'} - {event.ip || 'Unknown IP'}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
       {showArchiveDialog ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/55 px-4 backdrop-blur-sm">
           <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl">
@@ -383,3 +535,12 @@ export default function AdminDashboard() {
     </div>
   );
 }
+
+
+
+
+
+
+
+
+

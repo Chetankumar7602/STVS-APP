@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import bcrypt from 'bcryptjs';
 
 const AdminUserSchema = new mongoose.Schema({
   username: {
@@ -11,6 +10,39 @@ const AdminUserSchema = new mongoose.Schema({
   password: {
     type: String,
     required: [true, 'Please provide a password'],
+  },
+  email: {
+    type: String,
+    trim: true,
+    lowercase: true,
+    default: '',
+  },
+  phone: {
+    type: String,
+    trim: true,
+    default: '',
+  },
+  role: {
+    type: String,
+    enum: ['admin', 'superadmin'],
+    default: 'admin',
+  },
+  twoFactorEnabled: {
+    type: Boolean,
+    default: false,
+  },
+  twoFactorMethod: {
+    type: String,
+    enum: ['email', 'sms', 'authenticator'],
+    default: 'email',
+  },
+  totpSecret: {
+    type: String,
+    default: '',
+  },
+  passwordUpdatedAt: {
+    type: Date,
+    default: Date.now,
   },
 });
 

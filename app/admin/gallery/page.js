@@ -601,9 +601,8 @@ export default function GalleryManager() {
 
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">{mainLabel}</label>
-                  <div
+                  <label
                     className="mt-1 flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-center cursor-pointer hover:border-primary/60 hover:bg-primary/5"
-                    onClick={() => mainFileInputRef.current?.click()}
                     onDragOver={(e) => {
                       e.preventDefault();
                       e.dataTransfer.dropEffect = 'copy';
@@ -639,7 +638,7 @@ export default function GalleryManager() {
                         }
                       }}
                     />
-                  </div>
+                  </label>
                 </div>
 
                 <div>
@@ -669,9 +668,8 @@ export default function GalleryManager() {
                 {formData.type === 'video' && (
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1">{tr('admin.gallery.thumbnailUpload', 'Thumbnail image (optional)')}</label>
-                    <div
+                    <label
                       className="mt-1 flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-center cursor-pointer hover:border-primary/60 hover:bg-primary/5"
-                      onClick={() => thumbFileInputRef.current?.click()}
                       onDragOver={(e) => {
                         e.preventDefault();
                         e.dataTransfer.dropEffect = 'copy';
@@ -701,7 +699,7 @@ export default function GalleryManager() {
                           }
                         }}
                       />
-                    </div>
+                    </label>
                   </div>
                 )}
 

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, Heart, MessageSquare, HandHeart, LogOut, Camera, BookOpen, Settings, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Heart, MessageSquare, HandHeart, LogOut, Camera, BookOpen, Settings, Menu, X, Home } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { useLanguage } from '@/lib/useLanguage';
@@ -14,7 +14,7 @@ export default function AdminLayout({ children }) {
   const { tr } = useLanguage();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
-  const isLoginPage = pathname === '/admin/login';
+  const isAuthPage = pathname === '/admin/login' || pathname.startsWith('/admin/forgot-password');
 
   const navItems = [
     { href: '/admin', label: tr('admin.nav.dashboard', 'Dashboard'), icon: <LayoutDashboard size={20} /> },
@@ -40,22 +40,60 @@ export default function AdminLayout({ children }) {
   };
 
   useEffect(() => {
-    if (isLoginPage) return;
+    if (isAuthPage) return;
     setMobileNavOpen(false);
-  }, [pathname, isLoginPage]);
+  }, [pathname, isAuthPage]);
 
   useEffect(() => {
-    if (isLoginPage) return;
+    if (isAuthPage) return;
     if (!mobileNavOpen) return;
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     return () => {
       document.body.style.overflow = prevOverflow;
     };
-  }, [mobileNavOpen, isLoginPage]);
+  }, [mobileNavOpen, isAuthPage]);
 
-  // Don't show sidebar on login page
-  if (isLoginPage) {
+  useEffect(() => {
+    if (isAuthPage) return;
+
+    let isUnmounted = false;
+
+    const verifySession = async () => {
+      try {
+        const res = await fetch('/api/admin/session', { cache: 'no-store' });
+        if (res.status === 403 && !isUnmounted) {
+          window.location.href = '/';
+          return;
+        }
+        if (res.status === 401 && !isUnmounted) {
+          window.location.href = '/admin/login?reason=session_revoked';
+        }
+      } catch {
+        // Ignore transient network issues; next poll will retry.
+      }
+    };
+
+    // Immediate check plus fast periodic heartbeat so revoked sessions logout quickly.
+    verifySession();
+    const intervalId = window.setInterval(verifySession, 5000);
+
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        verifySession();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    return () => {
+      isUnmounted = true;
+      window.clearInterval(intervalId);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
+  }, [isAuthPage]);
+
+  // Don't show sidebar on auth pages
+  if (isAuthPage) {
     return <div className="admin-portal min-h-screen bg-slate-50">{children}</div>;
   }
 
@@ -102,6 +140,13 @@ export default function AdminLayout({ children }) {
         </nav>
 
         <div className="p-4 border-t border-slate-800 mt-auto">
+          <Link
+            href="/"
+            className="mb-2 flex items-center gap-3 rounded-xl px-4 py-3 text-slate-400 hover:bg-slate-800 hover:text-white transition-colors"
+          >
+            <Home size={20} />
+            {tr('admin.actions.goToPublicPage', 'Go to Public Page')}
+          </Link>
           <button
             onClick={handleLogout}
             className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 w-full transition-colors cursor-pointer"
@@ -144,7 +189,7 @@ export default function AdminLayout({ children }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.22, ease: 'easeOut' }}
-            className="fixed inset-0 z-[9999] bg-slate-900 lg:hidden overflow-y-auto"
+            className="fixed inset-0 z-9999 bg-slate-900 lg:hidden overflow-y-auto"
           >
             <div className="flex min-h-full flex-col px-4 pb-6 pt-5 md:pt-3">
               {/* Mobile-only header alignment/sizing: logo, title, and close button */}
@@ -168,7 +213,7 @@ export default function AdminLayout({ children }) {
                   className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/10 text-slate-100 hover:bg-white/20 md:h-11 md:w-11"
                   aria-label="Close navigation menu"
                 >
-                  <X size={18} className="md:h-[22px] md:w-[22px]" />
+                  <X size={18} className="md:h-5.5 md:w-5.5" />
                 </button>
               </div>
               {/* Mobile-only spacing before the separator line under the sidebar header */}
@@ -196,6 +241,13 @@ export default function AdminLayout({ children }) {
             </nav>
 
               <div className="mt-auto pt-6">
+                <Link
+                  href="/"
+                  className="mb-2 flex w-full items-center justify-center gap-2 rounded-xl border border-slate-600 bg-transparent px-4 py-3 text-base font-semibold text-white hover:bg-slate-800"
+                >
+                  <Home size={18} />
+                  {tr('admin.actions.goToPublicPage', 'Go to Public Page')}
+                </Link>
                 <button
                   onClick={handleLogout}
                   className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-3 text-base font-semibold text-white hover:bg-red-700"

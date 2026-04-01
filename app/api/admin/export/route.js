@@ -7,18 +7,7 @@ import Volunteer from '@/models/Volunteer';
 import GalleryItem from '@/models/GalleryItem';
 import SiteSetting from '@/models/SiteSetting';
 import { getSanityGalleryItems } from '@/lib/sanityGallery';
-import { verifyToken } from '@/lib/auth';
-import { cookies } from 'next/headers';
-
-async function requireAdmin() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get('adminToken')?.value;
-  if (!token || !verifyToken(token)) {
-    return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
-  }
-
-  return null;
-}
+import { authenticate } from '@/lib/auth';
 
 function normalizeSections(input) {
   const defaults = {
@@ -151,8 +140,8 @@ async function buildWorkbook(sections) {
 }
 
 export async function GET(request) {
-  const authResp = await requireAdmin();
-  if (authResp) return authResp;
+  const auth = await authenticate(request);
+  if (auth instanceof NextResponse) return auth;
 
   try {
     const wb = await buildWorkbook({
@@ -181,8 +170,8 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
-  const authResp = await requireAdmin();
-  if (authResp) return authResp;
+  const auth = await authenticate(request);
+  if (auth instanceof NextResponse) return auth;
 
   try {
     const body = await request.json().catch(() => ({}));
