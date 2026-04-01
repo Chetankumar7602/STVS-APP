@@ -52,29 +52,40 @@ export default function AdminLogin() {
       const data = await readJsonResponse(res);
       if (res.ok && data.success) {
         if (isMobile && supportsPasskey) {
-          const wantsFingerprint = window.confirm('Enable fingerprint login on this mobile device?');
-          if (wantsFingerprint) {
-            try {
-              const optionsRes = await fetch('/api/admin/security/passkey/register/options', { method: 'POST' });
-              const optionsData = await readJsonResponse(optionsRes);
-              if (optionsRes.ok && optionsData.success) {
-                const { startRegistration } = await import('@simplewebauthn/browser');
-                const registrationResponse = await startRegistration({ optionsJSON: optionsData.options });
-                const verifyRes = await fetch('/api/admin/security/passkey/register/verify', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ response: registrationResponse }),
-                });
-                const verifyData = await readJsonResponse(verifyRes);
-                if (!verifyRes.ok || !verifyData.success) {
-                  setMessage(verifyData.message || 'Fingerprint setup skipped.');
+          // Only offer fingerprint registration if no passkey is registered yet
+          try {
+            const existingRes = await fetch('/api/admin/security/passkey/list');
+            const existingData = await readJsonResponse(existingRes);
+            const hasPasskey = existingData.success && existingData.data && existingData.data.length > 0;
+
+            if (!hasPasskey) {
+              const wantsFingerprint = window.confirm('Enable fingerprint login on this mobile device?');
+              if (wantsFingerprint) {
+                try {
+                  const optionsRes = await fetch('/api/admin/security/passkey/register/options', { method: 'POST' });
+                  const optionsData = await readJsonResponse(optionsRes);
+                  if (optionsRes.ok && optionsData.success) {
+                    const { startRegistration } = await import('@simplewebauthn/browser');
+                    const registrationResponse = await startRegistration({ optionsJSON: optionsData.options });
+                    const verifyRes = await fetch('/api/admin/security/passkey/register/verify', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ response: registrationResponse }),
+                    });
+                    const verifyData = await readJsonResponse(verifyRes);
+                    if (!verifyRes.ok || !verifyData.success) {
+                      setMessage(verifyData.message || 'Fingerprint setup skipped.');
+                    }
+                  } else {
+                    setMessage(optionsData.message || 'Fingerprint setup skipped.');
+                  }
+                } catch {
+                  setMessage('Fingerprint setup skipped.');
                 }
-              } else {
-                setMessage(optionsData.message || 'Fingerprint setup skipped.');
               }
-            } catch {
-              setMessage('Fingerprint setup skipped.');
             }
+          } catch {
+            // Ignore — proceed to dashboard even if passkey check fails
           }
         }
         window.location.href = '/admin';
