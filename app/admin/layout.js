@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, Heart, MessageSquare, HandHeart, LogOut, Camera, BookOpen, Settings, Menu, X, Home } from 'lucide-react';
+import { LayoutDashboard, Heart, MessageSquare, HandHeart, LogOut, Camera, BookOpen, Settings, Menu, X, Home, ShieldCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { useLanguage } from '@/lib/useLanguage';
@@ -24,6 +24,7 @@ export default function AdminLayout({ children }) {
     { href: '/admin/cms', label: tr('admin.nav.cms', 'CMS Settings'), icon: <Settings size={20} /> },
     { href: '/admin/contacts', label: tr('admin.nav.messages', 'Messages'), icon: <MessageSquare size={20} /> },
     { href: '/admin/volunteers', label: tr('admin.nav.volunteers', 'Volunteers'), icon: <HandHeart size={20} /> },
+    { href: '/admin/security', label: tr('admin.nav.security', 'Security'), icon: <ShieldCheck size={20} /> },
   ];
 
   const handleLogout = async () => {
