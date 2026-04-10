@@ -42,7 +42,22 @@ export default function Gallery() {
   };
 
   if (loading) {
-    return <div className="h-96 flex items-center justify-center"><Loader2 className="animate-spin text-primary" /></div>;
+    return (
+      <section className="py-24 bg-slate-50 relative overflow-hidden">
+        <div className="container mx-auto px-4 md:px-6 relative z-10">
+          <div className="max-w-3xl mx-auto text-center mb-16 animate-pulse">
+            <div className="w-16 h-16 bg-slate-200/60 rounded-full mx-auto mb-6"></div>
+            <div className="h-10 bg-slate-200/60 w-80 max-w-full mx-auto rounded-xl mb-4"></div>
+            <div className="h-4 bg-slate-200/60 w-48 max-w-full mx-auto rounded-lg"></div>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 auto-rows-[200px]">
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+              <div key={i} className={`rounded-2xl bg-slate-200/60 animate-pulse ${i === 1 || i === 4 ? 'col-span-2 row-span-2' : ''}`} />
+            ))}
+          </div>
+        </div>
+      </section>
+    );
   }
 
   return (

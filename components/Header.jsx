@@ -83,7 +83,7 @@ export default function Header() {
   return (
     <>
     <header 
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-white/90 backdrop-blur-md shadow-sm py-3' : 'bg-transparent py-5'}`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'backdrop-blur-xl bg-white/75 border-b border-white/40 shadow-[0_4px_30px_rgba(0,0,0,0.05)] py-3' : 'bg-transparent py-5'}`}
     >
       <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
         <Link href="/" onClick={(e) => scrollToSection(e, 'home')} className="flex items-center gap-3 z-50">
@@ -156,13 +156,14 @@ export default function Header() {
             )}
           </div>
 
-          <a
+          <motion.a
+            whileTap={{ scale: 0.95 }}
             href="#donate"
             onClick={(e) => scrollToSection(e, 'donate')}
-            className="bg-secondary hover:bg-secondary/90 text-white px-6 py-2.5 rounded-full font-medium transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+            className="cursor-pointer bg-secondary hover:bg-secondary/90 text-white px-6 py-2.5 rounded-full font-medium transition-colors shadow-md hover:shadow-lg"
           >
             {t.common.header.donateNow}
-          </a>
+          </motion.a>
         </nav>
 
         {/* Mobile Toggle */}
@@ -186,7 +187,7 @@ export default function Header() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
           transition={{ duration: 0.22, ease: 'easeOut' }}
-          className="fixed inset-0 bg-white z-[9999] flex flex-col items-center justify-center p-6 lg:hidden shadow-xl overflow-y-auto"
+          className="fixed inset-0 bg-white/80 backdrop-blur-2xl z-[9999] flex flex-col items-center justify-center p-6 lg:hidden shadow-xl overflow-y-auto"
           style={{ top: 0, left: 0, right: 0, bottom: 0 }}
         >
           {/* Close button top-right */}
@@ -232,13 +233,14 @@ export default function Header() {
               </div>
             </div>
 
-            <a
+            <motion.a
+              whileTap={{ scale: 0.95 }}
               href="#donate"
               onClick={(e) => scrollToSection(e, 'donate')}
-              className="mt-4 bg-primary text-white w-full py-4 rounded-full font-bold text-center shadow-lg active:scale-95 transition-transform text-lg"
+              className="mt-4 bg-primary text-white w-full py-4 rounded-full font-bold text-center shadow-lg transition-colors text-lg"
             >
               {t.common.header.donateNow}
-            </a>
+            </motion.a>
           </div>
         </motion.div>
       )}

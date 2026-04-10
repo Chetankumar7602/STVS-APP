@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Plus, Trash2, Loader2, Image as ImageIcon, Video, X, Camera, AlertTriangle, Link2, Download } from 'lucide-react';
+import { Plus, Trash2, Loader2, Image as ImageIcon, Video, X, Camera, AlertTriangle, Link2, Download, Copy, Check } from 'lucide-react';
 import { readJsonResponse } from '@/lib/response';
 import PaginationControls from '@/components/admin/PaginationControls';
 import { useLanguage } from '@/lib/useLanguage';
@@ -16,6 +16,37 @@ const initialFormData = {
 };
 
 const PAGE_SIZE = 10;
+
+const CopyButton = ({ text, tr }) => {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async (e) => {
+    e.stopPropagation();
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
+    }
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={handleCopy}
+      className={`p-1.5 rounded-lg transition-all duration-200 flex items-center gap-1.5 ${
+        copied 
+          ? 'bg-emerald-500 text-white' 
+          : 'bg-white/80 text-slate-600 hover:bg-white hover:text-primary shadow-sm border border-slate-200'
+      }`}
+      title={tr('admin.gallery.copyUrl', 'Copy URL')}
+    >
+      {copied ? <Check size={12} /> : <Copy size={12} />}
+      {copied && <span className="text-[10px] font-bold">{tr('admin.gallery.copied', 'Copied!')}</span>}
+    </button>
+  );
+};
 
 export default function GalleryManager() {
   const { tr } = useLanguage();
@@ -431,7 +462,11 @@ export default function GalleryManager() {
       )}
 
       {loading ? (
-        <div className="flex justify-center p-20"><Loader2 className="animate-spin" /></div>
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
+            <div key={i} className="aspect-4/5 bg-slate-200/60 rounded-2xl animate-pulse border border-slate-100 shadow-sm" />
+          ))}
+        </div>
       ) : items.length === 0 ? (
         <div className="rounded-3xl border border-dashed border-slate-200 bg-white p-12 text-center text-slate-500">
           {tr('admin.gallery.noItems', 'No gallery items yet. Upload or add URLs to publish items to the live gallery.')}
@@ -474,6 +509,18 @@ export default function GalleryManager() {
               >
                 <Trash2 size={14} />
               </button>
+
+              {/* URL Display & Copy */}
+              <div className="p-2 border-t border-slate-50 bg-slate-50/50 flex items-center justify-between gap-2">
+                <div className="flex-1 min-w-0">
+                  <p className="text-[10px] text-slate-400 font-mono truncate bg-white border border-slate-100 px-1.5 py-0.5 rounded" title={item.src}>
+                    {item.src}
+                  </p>
+                </div>
+                <div className="flex-shrink-0">
+                  <CopyButton text={item.src} tr={tr} />
+                </div>
+              </div>
             </div>
           ))}
         </div>

@@ -138,7 +138,11 @@ export default function BlogPage() {
         {error ? (
           <div className="rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700">{error}</div>
         ) : loading ? (
-          <div className="flex min-h-48 items-center justify-center text-slate-500">{tr('blogs.loadingStories', 'Loading stories...')}</div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <div key={index} className="h-[420px] animate-pulse rounded-3xl border border-slate-100 bg-slate-200/60" />
+            ))}
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredPosts.map((post, index) => (

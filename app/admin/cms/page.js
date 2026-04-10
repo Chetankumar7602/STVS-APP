@@ -62,7 +62,30 @@ export default function CMSManager() {
     }
   };
 
-  if (loading) return <div className="flex justify-center p-20"><Loader2 className="animate-spin text-primary" /></div>;
+  if (loading) {
+    return (
+      <div className="p-6 md:p-8 animate-pulse">
+        <div className="flex justify-between items-start mb-8 gap-4">
+          <div>
+            <div className="h-8 w-48 bg-slate-200/60 rounded mb-2"></div>
+            <div className="h-4 w-64 bg-slate-200/60 rounded"></div>
+          </div>
+          <div className="h-10 w-32 bg-slate-200/60 rounded-xl"></div>
+        </div>
+        <div className="flex justify-start mb-6">
+          <div className="h-12 w-96 bg-slate-200/60 rounded-xl"></div>
+        </div>
+        <div className="bg-white rounded-3xl border border-slate-100 p-8 shadow-sm">
+           <div className="h-6 w-32 bg-slate-200/60 rounded mb-6"></div>
+           <div className="space-y-4">
+             <div className="h-12 w-full bg-slate-200/60 rounded-xl"></div>
+             <div className="h-12 w-full bg-slate-200/60 rounded-xl"></div>
+             <div className="h-24 w-full bg-slate-200/60 rounded-xl"></div>
+           </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 md:p-8">

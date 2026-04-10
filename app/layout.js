@@ -5,6 +5,7 @@ import "./globals.css";
 import { siteData } from "@/lib/data";
 import FloatingMapsButton from "@/components/FloatingMapsButton";
 import RootLayoutClient from "@/components/RootLayoutClient";
+import FloatingBanner from "@/components/FloatingBanner";
 
 const outfit = Outfit({ subsets: ["latin"], display: 'swap' });
 
@@ -26,6 +27,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={`${outfit.className} antialiased`}>
         <RootLayoutClient>
+          <FloatingBanner />
           {children}
           <FloatingMapsButton />
         </RootLayoutClient>

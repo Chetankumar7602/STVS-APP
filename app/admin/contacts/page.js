@@ -340,7 +340,25 @@ export default function ContactsTable() {
 
         <div className="overflow-x-auto">
           {loading ? (
-            <div className="p-12 text-center text-slate-500">{tr('admin.common.loadingData', 'Loading data...')}</div>
+            <table className="w-full text-left border-collapse animate-pulse">
+              <thead>
+                <tr className="bg-white border-b border-slate-100">
+                 <th className="p-4 w-14"><div className="h-4 bg-slate-200/60 rounded" /></th>
+                 <th className="p-4 px-6 w-32"><div className="h-4 bg-slate-200/60 rounded" /></th>
+                 <th className="p-4 w-48"><div className="h-4 bg-slate-200/60 rounded" /></th>
+                 <th className="p-4 w-64"><div className="h-4 bg-slate-200/60 rounded" /></th>
+                 <th className="p-4"><div className="h-4 bg-slate-200/60 rounded" /></th>
+                 <th className="p-4 w-20"><div className="h-4 bg-slate-200/60 rounded" /></th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-50">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <tr key={i}>
+                    {Array.from({ length: 6 }).map((_, j) => <td key={j} className="p-4 px-6"><div className="h-4 bg-slate-200/60 rounded w-full" /></td>)}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           ) : contacts.length === 0 ? (
             <div className="p-12 text-center text-slate-500">{tr('admin.contacts.noMessages', 'No messages found.')}</div>
           ) : (

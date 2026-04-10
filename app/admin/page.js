@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from 'react';
-import { IndianRupee, MessageSquare, HandHeart, ArrowUpRight, Download, Trash2, Loader2, ShieldAlert } from 'lucide-react';
+import { IndianRupee, MessageSquare, HandHeart, ArrowUpRight, Download, Trash2, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { readJsonResponse } from '@/lib/response';
 import { useLanguage } from '@/lib/useLanguage';
@@ -22,10 +22,6 @@ export default function AdminDashboard() {
   const [exportMsg, setExportMsg] = useState('');
   const [showArchiveDialog, setShowArchiveDialog] = useState(false);
   const [archiveMode, setArchiveMode] = useState('export'); // 'export' | 'exportClear'
-  const [sessions, setSessions] = useState([]);
-  const [securityEvents, setSecurityEvents] = useState([]);
-  const [sessionsLoading, setSessionsLoading] = useState(true);
-  const [revokeLoadingId, setRevokeLoadingId] = useState('');
   const [archiveSections, setArchiveSections] = useState({
     donations: true,
     contacts: true,
@@ -58,74 +54,9 @@ export default function AdminDashboard() {
     fetchStats();
   }, []);
 
-  useEffect(() => {
-    let cancelled = false;
 
-    async function fetchSecurityData() {
-      try {
-        if (cancelled) return;
 
-        setSessionsLoading(true);
 
-        const [sessionsRes, eventsRes] = await Promise.all([
-          fetch('/api/admin/sessions?all=1'),
-          fetch('/api/admin/security/events?all=1'),
-        ]);
-
-        if (sessionsRes.status === 401 || eventsRes.status === 401) {
-          window.location.href = '/admin/login';
-          return;
-        }
-
-        const [sessionsData, eventsData] = await Promise.all([
-          readJsonResponse(sessionsRes),
-          readJsonResponse(eventsRes),
-        ]);
-
-        if (sessionsData.success) {
-          setSessions(sessionsData.data || []);
-        }
-        if (eventsData.success) {
-          setSecurityEvents(eventsData.data || []);
-        }
-      } catch {
-        // Optional security panel; fail silently to avoid blocking dashboard.
-      } finally {
-        setSessionsLoading(false);
-      }
-    }
-
-    fetchSecurityData();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const revokeSession = async (sessionId) => {
-    try {
-      setRevokeLoadingId(sessionId);
-      const res = await fetch(`/api/admin/sessions/${sessionId}/revoke`, { method: 'POST' });
-      const data = await readJsonResponse(res);
-      if (!res.ok || !data.success) {
-        setExportMsg(data.message || 'Failed to revoke session.');
-        return;
-      }
-
-      setSessions((current) =>
-        current.map((session) =>
-          session.id === sessionId
-            ? { ...session, revokedAt: new Date().toISOString() }
-            : session
-        )
-      );
-      setExportMsg('Session revoked successfully.');
-    } catch {
-      setExportMsg('Failed to revoke session.');
-    } finally {
-      setRevokeLoadingId('');
-    }
-  };
 
   const downloadExport = async (sections) => {
     setExporting(true);
@@ -213,8 +144,41 @@ export default function AdminDashboard() {
 
   if (loading) {
     return (
-      <div className="flex h-[calc(100vh-2rem)] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-primary"></div>
+      <div className="p-6 md:p-8 animate-pulse">
+        <div className="mb-8">
+          <div className="h-8 w-48 bg-slate-200/60 rounded mb-2"></div>
+          <div className="h-4 w-96 bg-slate-200/60 rounded"></div>
+        </div>
+
+        <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="flex flex-col rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
+              <div className="mb-4 flex items-center justify-between">
+                <div className="h-12 w-12 rounded-2xl bg-slate-200/60"></div>
+                <div className="h-10 w-10 rounded-full bg-slate-200/60"></div>
+              </div>
+              <div className="mb-2 h-4 w-24 bg-slate-200/60 rounded"></div>
+              <div className="mb-6 h-10 w-32 bg-slate-200/60 rounded"></div>
+              <div className="mt-auto border-t border-slate-50 pt-4">
+                <div className="h-3 w-48 bg-slate-200/60 rounded"></div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="rounded-3xl border border-slate-100 bg-white p-8 shadow-sm">
+          <div className="mb-6 h-6 w-32 bg-slate-200/60 rounded"></div>
+          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-slate-100 p-4">
+                <div className="h-10 w-10 rounded-full bg-slate-200/60"></div>
+                <div className="h-4 w-24 bg-slate-200/60 rounded"></div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-6 h-24 rounded-2xl bg-slate-200/60 w-full"></div>
+        </div>
+
       </div>
     );
   }
@@ -374,79 +338,7 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      <div className="mt-6 rounded-2xl border border-sky-100 bg-sky-50 px-4 py-3 text-sm text-sky-800">
-        Security sign-in records (sessions, login attempts, and activity logs) are retained for 7 days and auto-deleted.
-      </div>
-      <div className="mt-8 grid gap-6 lg:grid-cols-2">
-        <div className="rounded-3xl border border-slate-100 bg-white shadow-sm flex flex-col overflow-hidden">
-          <div className="flex items-center gap-2 border-b border-slate-100 bg-white px-6 py-4">
-            <ShieldAlert size={18} className="text-slate-600" />
-            <h3 className="text-lg font-bold text-slate-800">Active Sessions</h3>
-          </div>
-          <div className="overflow-y-auto px-6 py-3 h-[23.5rem]">
-            {sessionsLoading ? (
-              <p className="text-sm text-slate-500">Loading sessions...</p>
-            ) : sessions.length === 0 ? (
-              <p className="text-sm text-slate-500">No active sessions found.</p>
-            ) : (
-              <div className="space-y-2">
-                {sessions.slice(0, 30).map((session) => (
-                  <div key={session.id} className="h-16 rounded-xl border border-slate-100 p-3">
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="text-sm font-semibold text-slate-700 truncate">{session.username}</p>
-                        <p className="mt-0.5 text-xs text-slate-500 truncate">
-                          {(session.ip || 'Unknown IP')}   Last active:{' '}
-                          {session.lastActivityAt ? new Date(session.lastActivityAt).toLocaleString('en-IN') : 'N/A'}
-                        </p>
-                      </div>
-                      {!session.revokedAt && !session.isCurrent ? (
-                        <button
-                          onClick={() => revokeSession(session.id)}
-                          disabled={revokeLoadingId === session.id}
-                          className="rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-100 disabled:opacity-60"
-                        >
-                          {revokeLoadingId === session.id ? 'Revoking...' : 'Revoke'}
-                        </button>
-                      ) : (
-                        <span className="text-xs font-semibold text-slate-400">
-                          {session.isCurrent ? 'Current' : 'Revoked'}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
 
-        <div className="rounded-3xl border border-slate-100 bg-white shadow-sm flex flex-col overflow-hidden">
-          <div className="flex items-center gap-2 border-b border-slate-100 bg-white px-6 py-4">
-            <ShieldAlert size={18} className="text-slate-600" />
-            <h3 className="text-lg font-bold text-slate-800">Security Activity</h3>
-          </div>
-          <div className="overflow-y-auto px-6 py-3 h-[23.5rem]">
-            {securityEvents.length === 0 ? (
-              <p className="text-sm text-slate-500">No security events yet.</p>
-            ) : (
-              <div className="space-y-2">
-                {securityEvents.slice(0, 30).map((event) => (
-                  <div key={event.id} className="h-16 rounded-xl border border-slate-100 p-3">
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm font-semibold text-slate-700 truncate">{event.type}</p>
-                      <span className="text-xs uppercase tracking-wide text-slate-400">{event.severity}</span>
-                    </div>
-                    <p className="mt-1 text-xs text-slate-500 truncate">
-                      {event.username || 'Unknown user'} - {event.ip || 'Unknown IP'}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
       {showArchiveDialog ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/55 px-4 backdrop-blur-sm">
           <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl">

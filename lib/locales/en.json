@@ -89,7 +89,7 @@
   "footer": {
     "title": "Subudhendra Teertha Vidya Samaste (R)",
     "tagline": "Education for Every Child",
-    "description": "A non-profit charitable trust providing free quality English-medium education, books, and uniforms to underprivileged children — LKG to 8th standard.",
+    "description": "A non-profit charitable trust providing free quality English-medium education, books, and uniforms to underprivileged children ??? LKG to 8th standard.",
     "certifications": {
       "eighty_g": "80G Certified",
       "twelve_a": "12A Registered",
@@ -98,7 +98,7 @@
     "contact": {
       "title": "Contact Us",
       "address": "Address",
-      "addressValue": "Guttala road, Hosaritti, Haveri – 581213",
+      "addressValue": "Guttala road, Hosaritti, Haveri ??? 581213",
       "email": "Email",
       "emailValue": "subudendrateerthavidyasamste@gmail.com",
       "phone": "Phone",
@@ -114,7 +114,7 @@
       "admin": "Admin Portal Login"
     },
     "copyright": "All rights reserved.",
-    "registered": "Registered under Section 12A • 80G Certified • CSR Eligible"
+    "registered": "Registered under Section 12A ??? 80G Certified ??? CSR Eligible"
   },
   "blogs": {
     "title": "Blog/News",
@@ -214,13 +214,13 @@
     "qrStep1Label": "Step 1",
     "qrStep1Title": "Scan & Pay via UPI",
     "qrStep1Text": "Use GPay, PhonePe, Paytm, BHIM, or any UPI app to scan this QR and pay directly to the trust account.",
-    "qrStep2Label": "Step 2 — Required",
+    "qrStep2Label": "Step 2 ??? Required",
     "qrStep2Text": "After paying, enter your UPI transaction reference / UTR number below and submit. This is mandatory to receive your receipt.",
     "taxNotice": "All donations are tax-deductible under Section 80G of the Income Tax Act. The institution is also registered under Section 12A and is eligible for CSR contributions.",
     "impactPoints": {
-      "books": "₹1,000 sponsors a child's books & stationery for a term",
-      "uniforms": "₹2,500 covers uniforms and shoes for a year",
-      "sixMonths": "₹5,000 provides complete education for 6 months",
+      "books": "???1,000 sponsors a child's books & stationery for a term",
+      "uniforms": "???2,500 covers uniforms and shoes for a year",
+      "sixMonths": "???5,000 provides complete education for 6 months",
       "directToChildren": "100% of your donation goes directly to the children"
     },
     "errors": {
@@ -303,7 +303,9 @@
       "gallery": "Gallery",
       "cms": "CMS Settings",
       "messages": "Messages",
-      "volunteers": "Volunteers"
+      "volunteers": "Volunteers",
+      "banner": "Banner",
+      "security": "Security"
     },
     "actions": {
       "logout": "Logout"
@@ -333,7 +335,8 @@
       "pending": "Pending",
       "email": "Email",
       "phone": "Phone",
-      "message": "Message"
+      "message": "Message",
+      "yes": "Yes"
     },
     "login": {
       "title": "Admin Login",
@@ -510,7 +513,9 @@
       "dropThumbHere": "Click to choose or drag & drop a thumbnail",
       "thumbHint": "Optional, but recommended for videos.",
       "videoUrlOrUploadRequired": "Upload a video file or paste a public video URL.",
-      "imageUrlOrUploadRequired": "Upload an image file or paste a public image URL."
+      "imageUrlOrUploadRequired": "Upload an image file or paste a public image URL.",
+      "copyUrl": "Copy URL",
+      "copied": "Copied!"
     },
     "cms": {
       "title": "Content Management",
@@ -598,6 +603,125 @@
       "upiReference": "UPI Reference",
       "manualReview": "Manual Review",
       "saveChanges": "Save Changes"
+    },
+    "security": {
+      "title": "Security Settings",
+      "subtitle": "Manage your fingerprint passkeys and account security.",
+      "passkeys": {
+        "title": "Fingerprint Passkeys",
+        "addButton": "Add Fingerprint",
+        "adding": "Registering...",
+        "removeButton": "Remove",
+        "confirmRemove": "Remove?",
+        "yes": "Yes",
+        "noBrowserSupport": "Your browser does not support passkey authentication.",
+        "noPasskeys": "No fingerprint passkeys registered yet.",
+        "noPasskeysHint": "Click 'Add Fingerprint' to register your device biometric.",
+        "lastUsed": "Last used:",
+        "addedOn": "Added:",
+        "removed": "Fingerprint passkey removed successfully.",
+        "registerFailed": "Fingerprint registration failed.",
+        "registerCancelled": "Fingerprint registration was cancelled or timed out.",
+        "registered": "Fingerprint registered successfully! You can now use it to log in."
+      },
+      "autoLock": {
+        "title": "Auto-Lock",
+        "description": "Protect your dashboard when you step away. If you are idle for this amount of time, the screen will lock automatically.",
+        "never": "Never",
+        "fiveMin": "5 Minutes",
+        "fifteenMin": "15 Minutes",
+        "thirtyMin": "30 Minutes",
+        "lockedTitle": "App Locked",
+        "lockedSubtitle": "You have been idle. Enter your master password to resume.",
+        "passwordPlaceholder": "Enter password...",
+        "unlockButton": "Unlock",
+        "returnToLogin": "return to login",
+        "orText": "Or",
+        "connectionError": "Connection error"
+      },
+      "devices": {
+        "title": "Your Active Devices",
+        "subtitle": "Currently signed-in browsers",
+        "signOutAll": "Sign out all other devices",
+        "noSessions": "No sessions found.",
+        "thisDevice": "This Device",
+        "ipLabel": "IP:",
+        "lastActiveLabel": "Last active:",
+        "revoke": "Revoke",
+        "revoking": "Revoking...",
+        "revokedLabel": "Revoked",
+        "revokeSuccess": "Device revoked successfully.",
+        "revokeFailed": "Failed to revoke device.",
+        "revokeAllSuccess": "Signed out of all other devices.",
+        "revokeAllFailed": "Failed to revoke sessions.",
+        "confirmTitle": "Sign out of all devices?",
+        "confirmBody": "This will immediately end all other active sessions. You will remain signed in on this device.",
+        "confirmButton": "Yes, sign out all",
+        "unknown": "Unknown"
+      }
+    },
+    "banner": {
+      "title": "Floating Banner Settings",
+      "subtitle": "Manage the floating announcement banner and its expandable rich-media pop-up.",
+      "basicsLayout": "Basics & Layout",
+      "live": "Live",
+      "hidden": "Hidden",
+      "messagelabel": "Small Banner Message (Title)",
+      "messagePlaceholder": "Enter short banner message here...",
+      "timerLabel": "Auto-Expire Timer",
+      "timerNever": "Never Expire (Manual Control)",
+      "timer1h": "1 Hour",
+      "timer6h": "6 Hours",
+      "timer1d": "1 Day",
+      "timer3d": "3 Days",
+      "timer1w": "1 Week",
+      "timer1m": "1 Month",
+      "expiresAt": "Banner stays live until:",
+      "positionLabel": "Position",
+      "positionTop": "Push-Down Top",
+      "positionTopLeft": "Top Left Corner",
+      "positionTopRight": "Top Right Corner",
+      "positionBottomCenter": "Bottom Center Floating",
+      "positionBottomLeft": "Bottom Left Widget",
+      "positionBottomRight": "Bottom Right Widget",
+      "positionCenterModal": "Center Modal Overlay",
+      "shapeLabel": "Shape",
+      "shapeSharp": "Sharp Box",
+      "shapeRounded": "Rounded Corners (Small)",
+      "shapeRoundedLg": "Rounded Corners (Large)",
+      "shapePill": "Pill Shape",
+      "shapeLeaf": "Leaf Style (Asymmetric)",
+      "sizeLabel": "Size / Width",
+      "sizeSmall": "Small (Compact)",
+      "sizeMedium": "Medium (Standard)",
+      "sizeLarge": "Large (Wide)",
+      "sizeFull": "Full Width",
+      "animationLabel": "Animation",
+      "animationSlide": "Smooth Slide",
+      "animationPop": "Pop / Scale Up",
+      "animationFade": "Simple Fade In",
+      "animationBounce": "Bouncy Spring",
+      "bgColor": "Background Color",
+      "textColor": "Text Color",
+      "mediaSection": "Media & Pop-up Details",
+      "mediaHint": "Adding details or media below will automatically make the banner clickable so users can expand it into a large pop-up.",
+      "mediaTypeLabel": "Media Type",
+      "mediaTypeNone": "None",
+      "mediaTypeImage": "Image",
+      "mediaUrlLabel": "Media URL",
+      "mediaUrlPlaceholderDisabled": "Select media type first...",
+      "mediaUrlPlaceholder": "Paste image URL here...",
+      "expandedContentLabel": "Expanded Content (Pop-up Paragraph)",
+      "expandedContentPlaceholder": "Write the full announcement here. You can use HTML tags like <br>, <b>, <i>, or <a> links.",
+      "savedSuccess": "Saved!",
+      "savedError": "Error saving",
+      "saving": "Saving...",
+      "saveButton": "Save Settings",
+      "previewTitle": "Live Preview",
+      "togglePopup": "Toggle Pop-up Preview",
+      "replayAnimation": "Replay Animation",
+      "previewMobileHidden": "Live preview is only available on desktop sizing.",
+      "previewTypePlaceholder": "Wait, type a message..."
     }
   }
 }

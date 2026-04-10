@@ -156,7 +156,7 @@ export default function DonateForm() {
               whileInView={{ opacity: 1, x: 0, scale: 1 }}
               viewport={{ once: false, amount: 0.1 }}
               transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
-              className="bg-white rounded-3xl shadow-2xl p-8 md:p-10 border border-slate-100 relative overflow-hidden"
+              className="bg-white/80 backdrop-blur-3xl rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] p-8 md:p-10 border border-white/50 relative overflow-hidden"
             >
               <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-secondary to-accent"></div>
 
@@ -165,20 +165,34 @@ export default function DonateForm() {
                   <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    className="w-20 h-20 bg-green-100 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6"
+                    transition={{ type: "spring", bounce: 0.5 }}
+                    className="w-24 h-24 bg-gradient-to-br from-green-100 to-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_40px_rgba(16,185,129,0.2)] border-2 border-green-200/50"
                   >
-                    <CheckCircle2 size={40} />
+                    <svg viewBox="0 0 50 50" className="w-12 h-12">
+                      <motion.path
+                        fill="none"
+                        strokeWidth="4"
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M 14 26 L 22 34 L 38 16"
+                        initial={{ pathLength: 0 }}
+                        animate={{ pathLength: 1 }}
+                        transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+                      />
+                    </svg>
                   </motion.div>
                   <h3 className="text-3xl font-bold text-slate-800 mb-4">Thank You!</h3>
                   <p className="text-slate-600 text-lg mb-8">
                     {successMessage || tr('donate.successDefault', 'Your generous donation has been recorded. We will contact you shortly with the receipt and further details.')}
                   </p>
-                  <button
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
                     onClick={() => { setSuccess(false); setSuccessMessage(''); }}
                     className="px-8 py-3 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-full font-medium transition-colors"
                   >
                     {tr('donate.makeAnother', 'Make another donation')}
-                  </button>
+                  </motion.button>
                 </div>
               ) : (
                 <div className="space-y-6">
@@ -198,16 +212,17 @@ export default function DonateForm() {
                     <label className="block text-sm font-medium text-slate-700 mb-3">{tr('donate.selectAmount', 'Select Amount (₹)')}</label>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
                       {amounts.map((amt) => (
-                        <button
+                        <motion.button
+                          whileTap={{ scale: 0.95 }}
                           type="button"
                           key={amt}
                           onClick={() => setFormData({ ...formData, amount: amt.toString() })}
                           className={`py-3 rounded-xl border-2 font-bold transition-all ${formData.amount === amt.toString()
-                            ? 'border-secondary bg-secondary/10 text-secondary'
+                            ? 'border-secondary bg-secondary/10 text-secondary shadow-inner'
                             : 'border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50'}`}
                         >
                           ₹{amt.toLocaleString('en-IN')}
-                        </button>
+                        </motion.button>
                       ))}
                     </div>
 
@@ -325,15 +340,16 @@ export default function DonateForm() {
                           className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                         />
                       </div>
-                      <button
+                      <motion.button
+                        whileTap={qrSubmitting ? {} : { scale: 0.96 }}
                         type="button"
                         onClick={handleUpiSubmit}
                         disabled={qrSubmitting}
-                        className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-3.5 font-semibold text-white transition-all hover:bg-emerald-700 hover:-translate-y-0.5 active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-70 shadow-md"
+                        className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-3.5 font-semibold text-white transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-70 shadow-md"
                       >
                         {qrSubmitting ? <Loader2 size={18} className="animate-spin" /> : <CheckCircle2 size={18} />}
                         {tr('donate.submitUpi', 'Submit Payment for Verification')}
-                      </button>
+                      </motion.button>
                     </div>
                   </div>
 

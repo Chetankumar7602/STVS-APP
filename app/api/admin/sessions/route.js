@@ -14,21 +14,27 @@ export async function GET(request) {
   const query = includeAll ? {} : { userId: auth.id };
   const sessions = await AdminSession.find(query).sort({ createdAt: -1 }).limit(50).lean();
 
+  const now = new Date();
   return NextResponse.json({
     success: true,
-    data: sessions.map((session) => ({
-      id: String(session._id),
-      tokenId: session.tokenId,
-      username: session.username,
-      authMethod: session.authMethod,
-      ip: session.ip,
-      userAgent: session.userAgent,
-      issuedAt: session.issuedAt,
-      lastActivityAt: session.lastActivityAt,
-      expiresAt: session.expiresAt,
-      revokedAt: session.revokedAt,
-      isCurrent: session.tokenId === auth.sid,
-    })),
+    data: sessions.map((session) => {
+      const isExpired = session.expiresAt && new Date(session.expiresAt) < now;
+      const trulyRevoked = session.revokedAt || isExpired;
+      
+      return {
+        id: String(session._id),
+        tokenId: session.tokenId,
+        username: session.username,
+        authMethod: session.authMethod,
+        ip: session.ip,
+        userAgent: session.userAgent,
+        issuedAt: session.issuedAt,
+        lastActivityAt: session.lastActivityAt,
+        expiresAt: session.expiresAt,
+        revokedAt: trulyRevoked ? (session.revokedAt || session.expiresAt) : null,
+        isCurrent: session.tokenId === auth.sid,
+      };
+    }),
   });
 }
 

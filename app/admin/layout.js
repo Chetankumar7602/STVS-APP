@@ -3,10 +3,11 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, Heart, MessageSquare, HandHeart, LogOut, Camera, BookOpen, Settings, Menu, X, Home, ShieldCheck } from 'lucide-react';
+import { LayoutDashboard, Heart, MessageSquare, HandHeart, LogOut, Camera, BookOpen, Settings, Menu, X, Home, ShieldCheck, Megaphone } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { useLanguage } from '@/lib/useLanguage';
+import AdminAutoLock from '@/components/admin/AdminAutoLock';
 
 export default function AdminLayout({ children }) {
   const pathname = usePathname();
@@ -24,6 +25,7 @@ export default function AdminLayout({ children }) {
     { href: '/admin/cms', label: tr('admin.nav.cms', 'CMS Settings'), icon: <Settings size={20} /> },
     { href: '/admin/contacts', label: tr('admin.nav.messages', 'Messages'), icon: <MessageSquare size={20} /> },
     { href: '/admin/volunteers', label: tr('admin.nav.volunteers', 'Volunteers'), icon: <HandHeart size={20} /> },
+    { href: '/admin/banner', label: tr('admin.nav.banner', 'Banner'), icon: <Megaphone size={20} /> },
     { href: '/admin/security', label: tr('admin.nav.security', 'Security'), icon: <ShieldCheck size={20} /> },
   ];
 
@@ -99,7 +101,8 @@ export default function AdminLayout({ children }) {
   }
 
   return (
-    <div className="admin-portal min-h-screen bg-slate-50 lg:flex lg:h-screen lg:overflow-hidden">
+    <AdminAutoLock>
+      <div className="admin-portal min-h-screen bg-slate-50 lg:flex lg:h-screen lg:overflow-hidden">
       {/* Desktop Sidebar */}
       <aside className="hidden w-64 shrink-0 flex-col border-r border-slate-800 bg-slate-900 lg:flex lg:h-full">
         <div className="p-6 border-b border-slate-800">
@@ -267,5 +270,6 @@ export default function AdminLayout({ children }) {
         {children}
       </main>
     </div>
+    </AdminAutoLock>
   );
 }

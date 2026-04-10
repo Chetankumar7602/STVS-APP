@@ -201,6 +201,57 @@ export default function AdminBlogsPage() {
   };
 
   // Blogs page restored to original implementation (layout, styles, and behavior).
+  if (loading) {
+    return (
+      <div className="p-6 md:p-8 animate-pulse">
+        <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <div className="h-8 w-32 bg-slate-200/60 rounded mb-2" />
+            <div className="h-4 w-96 bg-slate-200/60 rounded" />
+          </div>
+          <div className="h-10 w-28 bg-slate-200/60 rounded-xl" />
+        </div>
+
+        <div className="mb-6 h-20 w-full rounded-2xl bg-amber-100/60" />
+
+        <div className="grid gap-8 lg:grid-cols-[1.05fr_1.3fr]">
+          {/* Left: form skeleton */}
+          <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm space-y-4">
+            <div className="h-6 w-32 bg-slate-200/60 rounded mb-2" />
+            <div className="h-12 w-full bg-slate-200/60 rounded-xl" />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="h-12 bg-slate-200/60 rounded-xl" />
+              <div className="h-12 bg-slate-200/60 rounded-xl" />
+            </div>
+            <div className="h-12 w-full bg-slate-200/60 rounded-xl" />
+            <div className="h-24 w-full bg-slate-200/60 rounded-xl" />
+            <div className="h-48 w-full bg-slate-200/60 rounded-xl" />
+            <div className="h-12 w-full bg-slate-200/60 rounded-2xl" />
+          </div>
+
+          {/* Right: blog list skeleton */}
+          <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm space-y-4 min-h-[78vh]">
+            <div className="flex items-center justify-between mb-4">
+              <div className="h-6 w-36 bg-slate-200/60 rounded" />
+              <div className="h-8 w-16 bg-slate-200/60 rounded-full" />
+            </div>
+            {[1, 2, 3].map(i => (
+              <div key={i} className="rounded-2xl border border-slate-100 p-5 space-y-3">
+                <div className="flex items-center gap-2">
+                  <div className="h-6 w-24 bg-slate-200/60 rounded-full" />
+                  <div className="h-4 w-20 bg-slate-200/60 rounded" />
+                </div>
+                <div className="h-5 w-3/4 bg-slate-200/60 rounded" />
+                <div className="h-4 w-full bg-slate-200/60 rounded" />
+                <div className="h-4 w-2/3 bg-slate-200/60 rounded" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-6 md:p-8">
       <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
